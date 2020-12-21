@@ -4,11 +4,11 @@ public class Robot {
 
     private int id;
     private double x, y, heading;
+    private RobotType type;
 
-    public enum State {
-        IDEAL,
-        MOVE
-    }
+    public enum RobotType {PHYSICAL, VIRTUAL}
+
+    public enum RobotState {IDEAL, MOVE}
 
     public Robot(int id, double x, double y, double heading) {
 
@@ -17,11 +17,18 @@ public class Robot {
         this.y = y;
         this.heading = heading;
 
+        //TODO: Need to implement this
+        this.type = (id < 100) ? RobotType.PHYSICAL : RobotType.VIRTUAL;
+
         System.out.println("Robot object created !");
     }
 
     public int getId() {
         return this.id;
+    }
+
+    public RobotType getType() {
+        return this.type;
     }
 
     public double getX() {
@@ -35,11 +42,13 @@ public class Robot {
     public double getHeading() {
         return this.heading;
     }
-    public void setHeading(double heading){
+
+    public void setHeading(double heading) {
         // TODO: map between [-180,180]
         this.heading = heading;
     }
-    public void setCoordinate(double x , double y){
+
+    public void setCoordinate(double x, double y) {
         this.x = x;
         this.y = y;
     }
