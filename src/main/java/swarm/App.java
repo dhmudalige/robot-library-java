@@ -1,47 +1,19 @@
 package swarm;
 
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import swarm.robot.Robot;
+import swarm.mqtt.*;
 
 
 public class App 
 {
     public static void main( String[] args ){
 
-        String topic        = "MQTT Examples";
-        String content      = "Message from MqttPublishSample";
-        int qos             = 2;
-        String broker       = "tcp://68.183.188.135";
-        String clientId     = "JavaSample";
-        MemoryPersistence persistence = new MemoryPersistence();
+        //Robot r = new Robot(1,0,0,0);
+        //System.out.println(r.getId());
 
-        try {
-            MqttClient sampleClient = new MqttClient(broker, clientId, persistence);
-            MqttConnectOptions connOpts = new MqttConnectOptions();
+        MQTT m = new MQTT("68.183.188.135", 1883, "swarm_user", "swarm_usere15");
 
-            connOpts.setCleanSession(true);
-            sampleClient.connect(connOpts);
-            MqttMessage message = new MqttMessage(content.getBytes());
-            message.setQos(qos);
-            sampleClient.publish(topic, message);
-
-            System.out.println("Message published");
-
-            sampleClient.disconnect();
-            System.exit(0);
-
-        } catch(MqttException me) {
-            System.out.println("reason "+me.getReasonCode());
-            System.out.println("msg "+me.getMessage());
-            System.out.println("loc "+me.getLocalizedMessage());
-            System.out.println("cause "+me.getCause());
-            System.out.println("excep "+me);
-            me.printStackTrace();
-        }
-
-
+        m.publish("v1/test", "Hello");
+        m.subscribe("hello");
     }
 }
