@@ -6,9 +6,23 @@ public class Robot {
     private double x, y, heading;
     private RobotType type;
 
-    public enum RobotType {PHYSICAL, VIRTUAL}
+   public enum RobotType {PHYSICAL, VIRTUAL}
 
     public enum RobotState {IDEAL, MOVE}
+  
+    public void run() {
+        int id=getId();
+        double x=getX();
+        double y=getY();
+        double heading= getHeading();
+        System.out.println("id: "+id+" x: "+x+" y: "+y+" heading:"+heading);
+    }
+
+    public enum State {
+        IDEAL,
+        MOVE
+    }
+
 
     public Robot(int id, double x, double y, double heading) {
 
