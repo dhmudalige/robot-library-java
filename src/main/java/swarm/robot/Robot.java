@@ -5,6 +5,14 @@ public class Robot {
     private int id;
     private double x, y, heading;
 
+    public void run() {
+        int id=getId();
+        double x=getX();
+        double y=getY();
+        double heading= getHeading();
+        System.out.println("id: "+id+" x: "+x+" y: "+y+" heading:"+heading);
+    }
+
     public enum State {
         IDEAL,
         MOVE
