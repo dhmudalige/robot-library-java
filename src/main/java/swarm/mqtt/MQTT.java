@@ -18,9 +18,23 @@ public class MQTT implements MqttCallback {
     private MqttConnectOptions connOpts;
     private boolean isConnected = false;
 
+    private String server;
+    private int port;
+    private String userName, password;
+
     // Documentation: https://www.eclipse.org/paho/files/javadoc/index.html
 
     public MQTT(String server, int port, String userName, String password) {
+
+        this.server = server;
+        this.port = port;
+        this.userName = userName;
+        this.password = password;
+
+        connect();
+    }
+
+    public void connect() {
 
         String broker = "tcp://" + server + ":" + port;
         String clientId = "client_" + Math.random() * 1000;
@@ -105,7 +119,7 @@ public class MQTT implements MqttCallback {
 
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
-        System.out.println("MQTT "+ topic + ">> " +  new String(message.getPayload()));
+        System.out.println("MQTT " + topic + ">> " + new String(message.getPayload()));
     }
 
 }
