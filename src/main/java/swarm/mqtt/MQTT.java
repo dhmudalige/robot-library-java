@@ -1,5 +1,5 @@
 package swarm.mqtt;
-
+import java.util.*;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -12,8 +12,26 @@ import org.eclipse.paho.client.mqttv3.MqttTopic;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 
-public class MQTT implements MqttCallback {
+class Message implements Comparable<Message>{
+    int id;
+    String topic, message;
+    public Message(int id, String topic, String message) {
+        this.id = id;
+        this.topic = topic;
+        this.message = message;
+    }
+    public int compareTo(Message b) {
+        if(id>b.id){
+            return 1;
+        }else if(id<b.id){
+            return -1;
+        }else{
+            return 0;
+        }
+    }
+}
 
+public class MQTT implements MqttCallback {
     private MqttClient client;
     private MqttConnectOptions connOpts;
     private boolean isConnected = false;
@@ -47,7 +65,7 @@ public class MQTT implements MqttCallback {
             connOpts.setUserName(userName);
             connOpts.setPassword(password.toCharArray());
             connOpts.setKeepAliveInterval(60);
-
+            connOpts.setAutomaticReconnect(true);
             client.connect(connOpts);
             isConnected = true;
 
@@ -120,7 +138,21 @@ public class MQTT implements MqttCallback {
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         System.out.println("MQTT " + topic + ">> " + new String(message.getPayload()));
+
+        Queue<Message> queue=new PriorityQueue<Message>();
+
+        Message m1=new Message(1,"topic1","message1");
+        Message m2=new Message(2,"topic2","message2");
+        Message m3=new Message(3,"topic3","message3");
+
+        queue.add(m1);
+        queue.add(m2);
+        queue.add(m3);
+
+        for(Message b:queue){
+            System.out.println(b.id+" "+b.topic+" "+b.message);
+        }
+
     }
 
 }
-© 2020 GitHub, Inc.
