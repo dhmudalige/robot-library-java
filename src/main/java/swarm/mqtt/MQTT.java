@@ -12,6 +12,7 @@ import org.eclipse.paho.client.mqttv3.MqttTopic;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 
+
 class Message implements Comparable<Message>{
     int id;
     String topic, message;
@@ -32,6 +33,7 @@ class Message implements Comparable<Message>{
 }
 
 public class MQTT implements MqttCallback {
+    Queue<Message> queue=new PriorityQueue<Message>();
     private MqttClient client;
     private MqttConnectOptions connOpts;
     private boolean isConnected = false;
@@ -139,8 +141,6 @@ public class MQTT implements MqttCallback {
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         System.out.println("MQTT " + topic + ">> " + new String(message.getPayload()));
 
-        Queue<Message> queue=new PriorityQueue<Message>();
-
         Message m1=new Message(1,"topic1","message1");
         Message m2=new Message(2,"topic2","message2");
         Message m3=new Message(3,"topic3","message3");
@@ -149,10 +149,17 @@ public class MQTT implements MqttCallback {
         queue.add(m2);
         queue.add(m3);
 
-        for(Message b:queue){
-            System.out.println(b.id+" "+b.topic+" "+b.message);
-        }
-
+        execute();
     }
 
+    public void execute(){
+        int size = queue.size();
+        for (int i = 0; i < size; i++) {
+            Message m = queue.poll();
+            if (m == null) {
+                break;
+            }
+            System.out.println(m.id+" "+m.topic+" "+m.message);
+        }
+    }
 }
