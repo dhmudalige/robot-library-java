@@ -4,6 +4,8 @@ import swarm.mqtt.MQTT;
 import swarm.robot.helpers.Coordinates;
 import swarm.robot.sensors.DistanceSensor;
 
+import java.util.Queue;
+
 public class Robot implements Runnable {
 
     // Sensors
@@ -91,3 +93,4 @@ public class Robot implements Runnable {
         }
     }
 }
+
