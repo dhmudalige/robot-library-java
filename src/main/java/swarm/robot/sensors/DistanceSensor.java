@@ -1,22 +1,23 @@
 package swarm.robot.sensors;
 
-import swarm.mqtt.MQTT;
+import swarm.mqtt.MqttHandler;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.json.simple.JSONObject;
+import swarm.mqtt.MqttMsg;
 
 public class DistanceSensor {
 
     private List<String> topicsSub = new ArrayList<String>();
-    private MQTT mqtt;
+    private MqttHandler mqttHandler;
     private int robotId;
 
-    public DistanceSensor(int robotId, MQTT m) {
+    public DistanceSensor(int robotId, MqttHandler m) {
         //m.publish("v1/distance/test", String.valueOf(robotId) );
 
-        this.mqtt = m;
+        this.mqttHandler = m;
         this.robotId = robotId;
 
         topicsSub.add("v1/sensor/distance/" + robotId);
@@ -27,11 +28,22 @@ public class DistanceSensor {
     }
 
     private void subscribe() {
-
-        for( String topic : topicsSub){
-            mqtt.subscribe(topic);
+        for (String topic : topicsSub) {
+            mqttHandler.subscribe(topic);
             System.out.println("Subscribed to " + topic);
         }
+    }
+
+    public void handleSubscription(MqttMsg m) {
+        // TODO: handle logic for the message,
+    }
+
+    public float getDistance() {
+        // TODO: implement a blocking call for this.
+        // Publish to v1/sensor/distance/ -> {id: this.id}
+        // Wait until message received to v1/sensor/distance/{this.id}
+
+        return 0;
     }
 
     public void sendDistance(double d) {
@@ -41,7 +53,7 @@ public class DistanceSensor {
         obj.put("id", robotId);
         obj.put("dist", d);
 
-        mqtt.publish("v1/sensor/distance/", obj.toJSONString());
+        mqttHandler.publish("v1/sensor/distance/", obj.toJSONString());
     }
 
     public List<String> topicsSub() {
