@@ -42,12 +42,20 @@ public class Robot implements Runnable {
         //m.publish("v1/test", "Hello");
         //m.subscribe("hello");
 
+        // TODO: Subscribe to default topics
+
+        // ---------------------------------
+
         distSensor = new DistanceSensor(id, mqtt);
+
 
         System.out.println(id + "> Robot setup completed !");
     }
 
     public void loop() {
+
+        // TODO: Algorithm implements here
+
         //System.out.println("id: " + getId());
         //distSensor.sendDistance(100);
 
@@ -57,7 +65,6 @@ public class Robot implements Runnable {
     private void delay(int milliseconds) {
         try {
             Thread.sleep(1000);
-
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
@@ -85,6 +92,5 @@ public class Robot implements Runnable {
 
         }
     }
-
-
 }
+
