@@ -1,17 +1,18 @@
 package swarm;
 
 import swarm.robot.Robot;
+import swarm.robot.VirtualRobot;
 
 public class Swarm extends Thread {
     public static void main( String[] args ){
 
-        int robotCount = 2;
+        int virtualRobotCount = 1;
 
-        Robot[] r = new Robot[robotCount];
+        Robot[] vr = new VirtualRobot[virtualRobotCount];
 
-        for(int i=0;i<robotCount;i++){
-            r[i] = new Robot(i,0,0,90);
-            new Thread(r[i]).start();
+        for(int i=0;i<virtualRobotCount;i++){
+            vr[i] = new VirtualRobot(i,0,40*i,90);
+            new Thread(vr[i]).start();
         }
     }
 }

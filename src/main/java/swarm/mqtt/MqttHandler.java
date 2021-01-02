@@ -1,5 +1,7 @@
 package swarm.mqtt;
 
+import java.util.*;
+
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -7,29 +9,31 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import org.eclipse.paho.client.mqttv3.MqttCallback;
-import org.eclipse.paho.client.mqttv3.MqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttTopic;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 
-public class MQTT implements MqttCallback {
 
+public class MqttHandler implements MqttCallback {
     private MqttClient client;
-    private MqttConnectOptions connOpts;
     private boolean isConnected = false;
 
-    private String server;
-    private int port;
-    private String userName, password;
+    private final String server;
+    private final int port;
+    private final String userName, password;
+    private final String channel;
+
+    public Queue<MqttMsg> inQueue = new PriorityQueue<MqttMsg>();
+    public Queue<MqttMsg> outQueue = new PriorityQueue<MqttMsg>();
 
     // Documentation: https://www.eclipse.org/paho/files/javadoc/index.html
 
-    public MQTT(String server, int port, String userName, String password) {
+    public MqttHandler(String server, int port, String userName, String password, String channel) {
 
         this.server = server;
         this.port = port;
         this.userName = userName;
         this.password = password;
+        this.channel = channel;
 
         connect();
     }
@@ -42,12 +46,12 @@ public class MQTT implements MqttCallback {
 
         try {
             client = new MqttClient(broker, clientId, persistence);
-            connOpts = new MqttConnectOptions();
+            MqttConnectOptions connOpts = new MqttConnectOptions();
             connOpts.setCleanSession(true);
             connOpts.setUserName(userName);
             connOpts.setPassword(password.toCharArray());
             connOpts.setKeepAliveInterval(60);
-
+            connOpts.setAutomaticReconnect(true);
             client.connect(connOpts);
             isConnected = true;
 
@@ -72,12 +76,13 @@ public class MQTT implements MqttCallback {
     public void publish(String topic, String body, int qos) {
         if (isConnected) {
 
-            MqttMessage message = new MqttMessage(body.getBytes());
-            message.setQos(qos);
+            String t = channel + "/" + topic;  // prepare topic with message channel
+            MqttMessage m = new MqttMessage(body.getBytes());
+            m.setQos(qos);
 
             try {
-                this.client.publish(topic, message);
-                System.out.println("Message published");
+                this.client.publish(t, m);
+                //System.out.println("Message " + m + ", published to " + t );
 
             } catch (MqttException me) {
                 printMQTTError(me);
@@ -105,7 +110,6 @@ public class MQTT implements MqttCallback {
         me.printStackTrace();
     }
 
-
     @Override
     public void connectionLost(Throwable t) {
         System.out.println("Connection lost!");
@@ -114,12 +118,19 @@ public class MQTT implements MqttCallback {
 
     @Override
     public void deliveryComplete(IMqttDeliveryToken token) {
-        System.out.println("Delivery completed!");
     }
 
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         System.out.println("MQTT " + topic + ">> " + new String(message.getPayload()));
+        inQueue.add(new MqttMsg(topic, new String(message.getPayload())));
     }
 
+    public MqttMsg inQueue() {
+        return this.inQueue.poll();
+    }
+
+    public MqttMsg outQueue() {
+        return this.outQueue.poll();
+    }
 }

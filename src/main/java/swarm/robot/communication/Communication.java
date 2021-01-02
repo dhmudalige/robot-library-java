@@ -1,6 +1,6 @@
 package swarm.robot.communication;
 
-public class Communication {
+public abstract class Communication {
 
     public Communication(){
 
