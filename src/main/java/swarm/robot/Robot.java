@@ -2,13 +2,18 @@ package swarm.robot;
 
 import swarm.mqtt.MqttHandler;
 import swarm.mqtt.MqttMsg;
-import swarm.robot.helpers.Coordinates;
+import swarm.patterns.CircularMove;
+import swarm.patterns.Pattern;
+import swarm.robot.helpers.Coordinate;
+import swarm.robot.helpers.MotionController;
 import swarm.robot.sensors.DistanceSensor;
 
 public class Robot implements Runnable {
 
     // Sensors
     private DistanceSensor distSensor;
+    private Pattern pattern;
+    public MotionController motion;
 
     // Types
     public enum RobotType {UNDEFINED, PHYSICAL, VIRTUAL}
@@ -17,7 +22,7 @@ public class Robot implements Runnable {
 
     // Variables
     protected int id;
-    protected Coordinates coordinates;
+    protected Coordinate coordinates;
     protected RobotType type;
 
     public MqttHandler mqttHandler;
@@ -25,10 +30,13 @@ public class Robot implements Runnable {
     public Robot(int id, double x, double y, double heading) {
 
         this.id = id;
-        coordinates = new Coordinates(x, y, heading);
+        String channel = "v1";
 
-        //TODO: Need to implement this
-        this.type = (id < 100) ? RobotType.PHYSICAL : RobotType.VIRTUAL;
+        mqttHandler = new MqttHandler("68.183.188.135", 1883, "swarm_user", "swarm_usere15", channel);
+        coordinates = new Coordinate(id, x, y, heading, mqttHandler);
+
+        this.pattern = new CircularMove(this);
+        this.motion = new MotionController(coordinates);
 
         //System.out.println(id + "> Robot object created !");
     }
@@ -36,9 +44,7 @@ public class Robot implements Runnable {
     public void setup() {
         // TODO: add the things need to be setup at the beginning
 
-        mqttHandler = new MqttHandler("68.183.188.135", 1883, "swarm_user", "swarm_usere15");
-
-        //m.publish("v1/test", "Hello");
+        //m.publish("test", "Hello");
         //m.subscribe("hello");
 
         // TODO: Subscribe to default topics
@@ -46,16 +52,14 @@ public class Robot implements Runnable {
         // ---------------------------------
 
         distSensor = new DistanceSensor(id, mqttHandler);
-
-
+        pattern.setup();
         System.out.println(id + "> Robot setup completed !");
     }
 
     public void loop() {
-
-        // TODO: Algorithms implement here
-
-        delay(1000);
+        pattern.loop();
+        //coordinates.print();
+        delay(500);
     }
 
     private void delay(int milliseconds) {
