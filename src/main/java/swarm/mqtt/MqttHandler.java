@@ -20,18 +20,20 @@ public class MqttHandler implements MqttCallback {
     private final String server;
     private final int port;
     private final String userName, password;
+    private final String channel;
 
     public Queue<MqttMsg> inQueue = new PriorityQueue<MqttMsg>();
     public Queue<MqttMsg> outQueue = new PriorityQueue<MqttMsg>();
 
     // Documentation: https://www.eclipse.org/paho/files/javadoc/index.html
 
-    public MqttHandler(String server, int port, String userName, String password) {
+    public MqttHandler(String server, int port, String userName, String password, String channel) {
 
         this.server = server;
         this.port = port;
         this.userName = userName;
         this.password = password;
+        this.channel = channel;
 
         connect();
     }
@@ -74,12 +76,13 @@ public class MqttHandler implements MqttCallback {
     public void publish(String topic, String body, int qos) {
         if (isConnected) {
 
-            MqttMessage message = new MqttMessage(body.getBytes());
-            message.setQos(qos);
+            String t = channel + "/" + topic;  // prepare topic with message channel
+            MqttMessage m = new MqttMessage(body.getBytes());
+            m.setQos(qos);
 
             try {
-                this.client.publish(topic, message);
-                System.out.println("Message published");
+                this.client.publish(t, m);
+                //System.out.println("Message " + m + ", published to " + t );
 
             } catch (MqttException me) {
                 printMQTTError(me);
@@ -115,7 +118,6 @@ public class MqttHandler implements MqttCallback {
 
     @Override
     public void deliveryComplete(IMqttDeliveryToken token) {
-        System.out.println("Delivery completed!");
     }
 
     @Override
@@ -127,6 +129,7 @@ public class MqttHandler implements MqttCallback {
     public MqttMsg inQueue() {
         return this.inQueue.poll();
     }
+
     public MqttMsg outQueue() {
         return this.outQueue.poll();
     }

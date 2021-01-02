@@ -6,7 +6,7 @@ import swarm.robot.VirtualRobot;
 public class Swarm extends Thread {
     public static void main( String[] args ){
 
-        int virtualRobotCount = 2;
+        int virtualRobotCount = 1;
 
         Robot[] vr = new VirtualRobot[virtualRobotCount];
 

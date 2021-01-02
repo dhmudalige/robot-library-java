@@ -20,8 +20,8 @@ public class DistanceSensor {
         this.mqttHandler = m;
         this.robotId = robotId;
 
-        topicsSub.add("v1/sensor/distance/" + robotId);
-        topicsSub.add("v1/sensor/distance/" + robotId + "/?");
+        topicsSub.add("sensor/distance/" + robotId);
+        topicsSub.add("sensor/distance/" + robotId + "/?");
 
         subscribe();
 
@@ -53,7 +53,7 @@ public class DistanceSensor {
         obj.put("id", robotId);
         obj.put("dist", d);
 
-        mqttHandler.publish("v1/sensor/distance/", obj.toJSONString());
+        mqttHandler.publish("sensor/distance/", obj.toJSONString());
     }
 
     public List<String> topicsSub() {
