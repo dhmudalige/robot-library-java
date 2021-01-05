@@ -159,7 +159,14 @@ public class MQTT implements MqttCallback {
             if (m == null) {
                 break;
             }
+            mqttExecute(m.topic,m.message);
             System.out.println(m.id+" "+m.topic+" "+m.message);
+        }
+    }
+
+    public void mqttExecute(String topic,String message){
+        if(topic=="topic1"){
+            System.out.println(message);
         }
     }
 }

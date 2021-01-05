@@ -21,7 +21,28 @@ public class Robot implements Runnable {
     private RobotType type;
 
     // TODO: Encapsulate this
-    public MQTT mqtt;
+    private MQTT mqtt;
+
+    private String server="68.183.188.135";
+    private int port=1883;
+    private String userName="swarm_user";
+    private String password="swarm_usere15";
+
+    public String getServer() {
+        return server;
+    }
+    public int getPort() {
+        return port;
+    }
+    public String getUserName() {
+        return userName;
+    }
+    public MQTT getMqtt() {
+        return mqtt;
+    }
+    public String getPassword() {
+        return password;
+    }
 
     public Robot(int id, double x, double y, double heading) {
 
@@ -37,7 +58,7 @@ public class Robot implements Runnable {
     public void setup() {
         // TODO: add the things need to be setup at the beginning
 
-        mqtt = new MQTT("68.183.188.135", 1883, "swarm_user", "swarm_usere15");
+        mqtt = new MQTT(server, port, userName, password);
 
         //m.publish("v1/test", "Hello");
         //m.subscribe("hello");
@@ -85,6 +106,5 @@ public class Robot implements Runnable {
 
         }
     }
-
-
 }
+
