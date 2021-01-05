@@ -1,5 +1,7 @@
 package swarm.mqtt;
+
 import java.util.*;
+
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -7,49 +9,31 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import org.eclipse.paho.client.mqttv3.MqttCallback;
-import org.eclipse.paho.client.mqttv3.MqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttTopic;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 
 
-class Message implements Comparable<Message>{
-    int id;
-    String topic, message;
-    public Message(int id, String topic, String message) {
-        this.id = id;
-        this.topic = topic;
-        this.message = message;
-    }
-    public int compareTo(Message b) {
-        if(id>b.id){
-            return 1;
-        }else if(id<b.id){
-            return -1;
-        }else{
-            return 0;
-        }
-    }
-}
-
-public class MQTT implements MqttCallback {
-    Queue<Message> queue=new PriorityQueue<Message>();
+public class MqttHandler implements MqttCallback {
     private MqttClient client;
-    private MqttConnectOptions connOpts;
     private boolean isConnected = false;
 
-    private String server;
-    private int port;
-    private String userName, password;
+    private final String server;
+    private final int port;
+    private final String userName, password;
+    private final String channel;
+
+    public Queue<MqttMsg> inQueue = new PriorityQueue<MqttMsg>();
+    public Queue<MqttMsg> outQueue = new PriorityQueue<MqttMsg>();
 
     // Documentation: https://www.eclipse.org/paho/files/javadoc/index.html
 
-    public MQTT(String server, int port, String userName, String password) {
+    public MqttHandler(String server, int port, String userName, String password, String channel) {
 
         this.server = server;
         this.port = port;
         this.userName = userName;
         this.password = password;
+        this.channel = channel;
 
         connect();
     }
@@ -62,7 +46,7 @@ public class MQTT implements MqttCallback {
 
         try {
             client = new MqttClient(broker, clientId, persistence);
-            connOpts = new MqttConnectOptions();
+            MqttConnectOptions connOpts = new MqttConnectOptions();
             connOpts.setCleanSession(true);
             connOpts.setUserName(userName);
             connOpts.setPassword(password.toCharArray());
@@ -92,12 +76,13 @@ public class MQTT implements MqttCallback {
     public void publish(String topic, String body, int qos) {
         if (isConnected) {
 
-            MqttMessage message = new MqttMessage(body.getBytes());
-            message.setQos(qos);
+            String t = channel + "/" + topic;  // prepare topic with message channel
+            MqttMessage m = new MqttMessage(body.getBytes());
+            m.setQos(qos);
 
             try {
-                this.client.publish(topic, message);
-                System.out.println("Message published");
+                this.client.publish(t, m);
+                //System.out.println("Message " + m + ", published to " + t );
 
             } catch (MqttException me) {
                 printMQTTError(me);
@@ -125,7 +110,6 @@ public class MQTT implements MqttCallback {
         me.printStackTrace();
     }
 
-
     @Override
     public void connectionLost(Throwable t) {
         System.out.println("Connection lost!");
@@ -134,39 +118,19 @@ public class MQTT implements MqttCallback {
 
     @Override
     public void deliveryComplete(IMqttDeliveryToken token) {
-        System.out.println("Delivery completed!");
     }
 
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         System.out.println("MQTT " + topic + ">> " + new String(message.getPayload()));
-
-        Message m1=new Message(1,"topic1","message1");
-        Message m2=new Message(2,"topic2","message2");
-        Message m3=new Message(3,"topic3","message3");
-
-        queue.add(m1);
-        queue.add(m2);
-        queue.add(m3);
-
-        execute();
+        inQueue.add(new MqttMsg(topic, new String(message.getPayload())));
     }
 
-    public void execute(){
-        int size = queue.size();
-        for (int i = 0; i < size; i++) {
-            Message m = queue.poll();
-            if (m == null) {
-                break;
-            }
-            mqttExecute(m.topic,m.message);
-            System.out.println(m.id+" "+m.topic+" "+m.message);
-        }
+    public MqttMsg inQueue() {
+        return this.inQueue.poll();
     }
 
-    public void mqttExecute(String topic,String message){
-        if(topic=="topic1"){
-            System.out.println(message);
-        }
+    public MqttMsg outQueue() {
+        return this.outQueue.poll();
     }
 }
