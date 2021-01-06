@@ -2,8 +2,8 @@ package swarm.patterns;
 
 import swarm.robot.Robot;
 
-public class CircularMove extends Pattern{
-    public CircularMove(Robot r) {
+public class GoToGoal extends Pattern{
+    public GoToGoal(Robot r) {
         super(r);
     }
 
@@ -12,6 +12,7 @@ public class CircularMove extends Pattern{
     }
 
     public void loop(){
-        r.motion.move(120,60,100);
+
+        r.motion.goToGoal(100,100,50);
     }
 }

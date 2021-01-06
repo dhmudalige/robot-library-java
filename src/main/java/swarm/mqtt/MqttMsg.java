@@ -11,15 +11,15 @@ public class MqttMsg implements Comparable<MqttMsg> {
 
     // For messages to be published
     public MqttMsg(String topic, String message, int QoS) {
-        this.id = nextId++;     // TODO: test the correctness
+        this.id = nextId++;
         this.topic = topic;
         this.message = message;
-        this.topicGroups = topic.split("/");
+        // this.topicGroups = topic.split("/");
         this.QoS = QoS;
     }
 
     public MqttMsg(String topic, String message) {
-        this.id = nextId++;     // TODO: test the correctness
+        this.id = nextId++;
         this.topic = topic;
         this.message = message;
         this.topicGroups = topic.split("/");
