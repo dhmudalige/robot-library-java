@@ -18,9 +18,16 @@ public class MotionController {
         move(leftSpeed, rightSpeed, maxInterval);
     }
 
-    public void move(int leftSpeed, int rightSpeed, int interval) {
+    // validate speeds to be between [-254, 255]
+    public boolean speedIsInRange(int speed){
+        if (-254 < speed && speed < 255) return true;
+        else return false;
+    }
 
-        // TODO: validate speeds to be between [-254, 255]
+    public void move(int leftSpeed, int rightSpeed, int interval) {
+        if(speedIsInRange(leftSpeed) && speedIsInRange(rightSpeed)){
+            System.out.println("Valid speed");
+        }
 
         int steps = (int) Math.ceil((double) interval / maxInterval);
         int stepInterval = interval / steps;
