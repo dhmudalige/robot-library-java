@@ -35,7 +35,11 @@ public class DistanceSensor {
     }
 
     public void handleSubscription(MqttMsg m) {
-        // TODO: handle logic for the message -> @DDilshani
+        if(m.topicGroups[1]=="robot"){
+            if((m.topic=="v1/sensor/distance/"+robotId) || (m.topic=="v1/sensor/distance/"+robotId)){
+                System.out.println(m.message);
+            }
+        }
     }
 
     public float getDistance() {
