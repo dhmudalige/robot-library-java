@@ -82,22 +82,28 @@ public class MqttHandler implements MqttCallback {
 
             try {
                 this.client.publish(t, m);
-                //System.out.println("Message " + m + ", published to " + t );
+                System.out.println("Message " + m + ", published to " + t );
 
             } catch (MqttException me) {
                 printMQTTError(me);
             }
         } else {
-            // Not connected
+            // TODO: Make a  warning
         }
     }
 
     public void subscribe(String topic) {
-        try {
-            client.subscribe(topic);
+        if (isConnected) {
+            try {
+                String t = channel + "/" + topic;  // prepare topic with message channel
+                client.subscribe(t);
+                System.out.println("Subscribed to " + t );
 
-        } catch (MqttException me) {
-            printMQTTError(me);
+            } catch (MqttException me) {
+                printMQTTError(me);
+            }
+        }else{
+            // TODO: Make a warning
         }
     }
 
