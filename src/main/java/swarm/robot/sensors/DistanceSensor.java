@@ -35,11 +35,11 @@ public class DistanceSensor {
     }
 
     public void handleSubscription(MqttMsg m) {
-        // TODO: handle logic for the message,
+        // TODO: handle logic for the message -> @DDilshani
     }
 
     public float getDistance() {
-        // TODO: implement a blocking call for this.
+        // TODO: implement a blocking call for this. -> @NuwanJ
         // Publish to v1/sensor/distance/ -> {id: this.id}
         // Wait until message received to v1/sensor/distance/{this.id}
 
