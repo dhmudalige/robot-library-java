@@ -50,7 +50,11 @@ public class Robot implements Runnable {
 
         distSensor = new DistanceSensor(id, mqttHandler);
         pattern.setup();
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 86a4c70e5306bc08935a0ebd8a021d153d9cff4e
         System.out.println(id + "> Robot setup completed !");
     }
 
