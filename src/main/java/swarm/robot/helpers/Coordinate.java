@@ -40,7 +40,7 @@ public class Coordinate {
     }
 
     public double getHeadingRad() {
-        return (double) ((this.heading / 360) * 2 * Math.PI);
+        return (double) (Math.toRadians(this.heading));
     }
 
     public void setHeading(double heading) {
@@ -48,7 +48,7 @@ public class Coordinate {
     }
 
     public void setHeadingRad(double heading) {
-        setHeading((heading * 180) / Math.PI);
+        setHeading(Math.toDegrees(heading));
     }
 
     public void setCoordinate(double x, double y) {

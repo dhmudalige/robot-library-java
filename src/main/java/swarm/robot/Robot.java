@@ -3,6 +3,7 @@ package swarm.robot;
 import swarm.mqtt.MqttHandler;
 import swarm.mqtt.MqttMsg;
 import swarm.patterns.CircularMove;
+import swarm.patterns.GoToGoal;
 import swarm.patterns.Pattern;
 import swarm.robot.helpers.Coordinate;
 import swarm.robot.helpers.MotionController;
@@ -42,17 +43,14 @@ public class Robot implements Runnable {
     }
 
     public void setup() {
-        // TODO: add the things need to be setup at the beginning
 
-        //m.publish("test", "Hello");
-        //m.subscribe("hello");
-
-        // TODO: Subscribe to default topics
+        // TODO: Subscribe to default topics -> @DDilshani
 
         // ---------------------------------
 
         distSensor = new DistanceSensor(id, mqttHandler);
         pattern.setup();
+        
         System.out.println(id + "> Robot setup completed !");
     }
 
@@ -84,7 +82,6 @@ public class Robot implements Runnable {
 
     @Override
     public void run() {
-
         setup();
 
         while (true) {
@@ -130,7 +127,7 @@ public class Robot implements Runnable {
     }
 
     private void handlePublishQueue() {
-        // TODO: publish messages in outQueue
+        // TODO: publish messages in outQueue -> @DDilshani
 
     }
 }
