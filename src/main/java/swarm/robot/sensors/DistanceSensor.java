@@ -36,6 +36,7 @@ public class DistanceSensor {
 
     public void handleSubscription(MqttMsg m) {
         // TODO: handle logic for the message -> @DDilshani
+
     }
 
     public float getDistance() {

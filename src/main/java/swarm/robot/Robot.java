@@ -8,6 +8,7 @@ import swarm.patterns.Pattern;
 import swarm.robot.helpers.Coordinate;
 import swarm.robot.helpers.MotionController;
 import swarm.robot.sensors.DistanceSensor;
+import java.util.*;
 
 public class Robot implements Runnable {
 
@@ -43,18 +44,13 @@ public class Robot implements Runnable {
     }
 
     public void setup() {
-
-        // TODO: Subscribe to default topics -> @DDilshani
-
-        // ---------------------------------
+        //Subscribe to default topics
+        mqttHandler.subscribe("v1/robot/msg/"+ getId());
+        mqttHandler.subscribe("v1/robot/msg/broadcast/");
 
         distSensor = new DistanceSensor(id, mqttHandler);
         pattern.setup();
-<<<<<<< HEAD
 
-=======
-        
->>>>>>> 86a4c70e5306bc08935a0ebd8a021d153d9cff4e
         System.out.println(id + "> Robot setup completed !");
     }
 
@@ -96,9 +92,7 @@ public class Robot implements Runnable {
     }
 
     private void handleSubscribeQueue() {
-        MqttMsg m = mqttHandler.inQueue();
-
-        while (m != null) {
+        for (MqttMsg m: mqttHandler.inQueue) {
             switch (m.topicGroups[1]) {
                 case "robot":
                     // Robot messages
@@ -125,13 +119,12 @@ public class Robot implements Runnable {
 
                     break;
             }
-
-            m = mqttHandler.inQueue();
         }
     }
 
     private void handlePublishQueue() {
-        // TODO: publish messages in outQueue -> @DDilshani
-
+        for (MqttMsg item: mqttHandler.outQueue) {
+            mqttHandler.publish(item.topic,item.message,item.QoS );
+        }
     }
 }

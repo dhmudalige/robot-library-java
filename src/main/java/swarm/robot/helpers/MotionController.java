@@ -84,7 +84,6 @@ public class MotionController {
             Thread.currentThread().interrupt();
         }
     }
-<<<<<<< HEAD
 
     public static double getSlope(double x1, double y1, double x2, double y2) {
         double dx = x2 - x1;
@@ -93,6 +92,3 @@ public class MotionController {
     }
 
 }
-=======
-}
->>>>>>> 86a4c70e5306bc08935a0ebd8a021d153d9cff4e
