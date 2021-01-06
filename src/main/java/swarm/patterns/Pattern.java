@@ -19,5 +19,3 @@ public abstract class Pattern {
     }
 
 }
-
-
