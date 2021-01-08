@@ -2,44 +2,46 @@ package swarm.robot.sensors;
 
 import swarm.mqtt.MqttHandler;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 import org.json.simple.JSONObject;
 import swarm.mqtt.MqttMsg;
 
-public class DistanceSensor {
+public class DistanceSensor extends AbstractSensor {
 
-    private List<String> topicsSub = new ArrayList<String>();
-    private MqttHandler mqttHandler;
-    private int robotId;
+    private enum mqttTopic {DISTANCE_IN, DISTANCE_LOOK}
+
+    private HashMap<mqttTopic, String> topicsSub = new HashMap<mqttTopic, String>();
 
     public DistanceSensor(int robotId, MqttHandler m) {
-        //m.publish("v1/distance/test", String.valueOf(robotId) );
-
-        this.mqttHandler = m;
-        this.robotId = robotId;
-
-        topicsSub.add("sensor/distance/" + robotId);
-        topicsSub.add("sensor/distance/" + robotId + "/?");
-
-        subscribe();
-
+        super(robotId, m);
+        subscribe(mqttTopic.DISTANCE_IN, "sensor/distance/" + robotId);
+        subscribe(mqttTopic.DISTANCE_LOOK, "sensor/distance/" + robotId + "/?");
     }
 
-    private void subscribe() {
-        for (String topic : topicsSub) {
-            mqttHandler.subscribe(topic);
-            System.out.println("Subscribed to " + topic);
-        }
+    private void subscribe(mqttTopic key, String topic) {
+        topicsSub.put(key, topic);      // Put to the queue
+        mqttHandler.subscribe(topic);   // Subscribe through MqttHandler
     }
 
+    @Override
     public void handleSubscription(MqttMsg m) {
-        if(m.topicGroups[1]=="robot"){
-            if((m.topic=="v1/sensor/distance/"+robotId) || (m.topic=="v1/sensor/distance/"+robotId)){
-                System.out.println(m.message);
-            }
+        // sensor/distance/
+        String topic = m.topic;
+        String msg = m.message;
+
+        if (topic.equals(topicsSub.get(mqttTopic.DISTANCE_IN))) {
+            // sensor/distance/{id}
+            System.out.println("Received: " + topic + "> " + msg);
+
+        } else if (topic.equals(topicsSub.get(mqttTopic.DISTANCE_LOOK))) {
+            // sensor/distance/{id}/?
+            System.out.println("Received: " + topic + "> " + msg);
+
+        } else {
+            System.out.println("Received (unknown): " + topic + "> " + msg);
         }
+
     }
 
     public float getDistance() {
@@ -60,7 +62,7 @@ public class DistanceSensor {
         mqttHandler.publish("sensor/distance/", obj.toJSONString());
     }
 
-    public List<String> topicsSub() {
+    public HashMap<mqttTopic, String> topicsSub() {
         return topicsSub;
     }
 }

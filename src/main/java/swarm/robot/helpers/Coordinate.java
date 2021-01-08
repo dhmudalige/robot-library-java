@@ -3,20 +3,21 @@ package swarm.robot.helpers;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
 
-import swarm.mqtt.MqttHandler;
+import swarm.mqtt.MqttMsg;
+import java.util.Queue;
 
 public class Coordinate {
 
     private double x, y, heading;
-    private MqttHandler mqtt;
-    private int robotId;
+    private final Queue<MqttMsg> mqttPublish;
+    private final int robotId;
 
-    public Coordinate(int robotId, double x, double y, double heading, MqttHandler mqtt) {
+    public Coordinate(int robotId, double x, double y, double heading, Queue<MqttMsg> mqtt) {
         this.x = x;
         this.y = y;
         this.heading = heading;
         this.robotId = robotId;
-        this.mqtt = mqtt;
+        this.mqttPublish = mqtt;
     }
 
     public double getX() {
@@ -79,7 +80,7 @@ public class Coordinate {
         obj.put("heading", round2(heading));
 
         jsonArray.add(obj);
-        mqtt.publish("localization/info", jsonArray.toJSONString());
+        mqttPublish.add(new MqttMsg("localization/info", jsonArray.toJSONString()));
     }
 
     private double round2(double x) {

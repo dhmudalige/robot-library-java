@@ -8,7 +8,6 @@ import swarm.patterns.Pattern;
 import swarm.robot.helpers.Coordinate;
 import swarm.robot.helpers.MotionController;
 import swarm.robot.sensors.DistanceSensor;
-import java.util.*;
 
 public class Robot implements Runnable {
 
@@ -35,7 +34,7 @@ public class Robot implements Runnable {
         String channel = "v1";
 
         mqttHandler = new MqttHandler("68.183.188.135", 1883, "swarm_user", "swarm_usere15", channel);
-        coordinates = new Coordinate(id, x, y, heading, mqttHandler);
+        coordinates = new Coordinate(id, x, y, heading, mqttHandler.outQueue);
 
         this.pattern = new CircularMove(this);
         this.motion = new MotionController(coordinates);
@@ -45,8 +44,8 @@ public class Robot implements Runnable {
 
     public void setup() {
         //Subscribe to default topics
-        mqttHandler.subscribe("v1/robot/msg/"+ getId());
-        mqttHandler.subscribe("v1/robot/msg/broadcast/");
+        mqttHandler.subscribe("robot/msg/" + getId());
+        mqttHandler.subscribe("robot/msg/broadcast");
 
         distSensor = new DistanceSensor(id, mqttHandler);
         pattern.setup();
@@ -55,7 +54,7 @@ public class Robot implements Runnable {
     }
 
     public void loop() {
-        pattern.loop();
+        //pattern.loop();
         //coordinates.print();
         delay(500);
     }
@@ -92,8 +91,12 @@ public class Robot implements Runnable {
     }
 
     private void handleSubscribeQueue() {
-        for (MqttMsg m: mqttHandler.inQueue) {
-            switch (m.topicGroups[1]) {
+        // Handle the messages in incoming queue
+
+        for (MqttMsg item : mqttHandler.inQueue) {
+            MqttMsg m = mqttHandler.inQueue.poll();
+
+            switch (m.topicGroups[0]) {
                 case "robot":
                     // Robot messages
                     System.out.println("Robot message received");
@@ -102,8 +105,8 @@ public class Robot implements Runnable {
                 case "sensor":
                     // Sensor messages
 
-                    if (m.topicGroups[2].equals("dist")) {
-                        System.out.println("distance sensor message received");
+                    if (m.topicGroups[1].equals("distance")) {
+                        // System.out.println("distance sensor message received");
                         distSensor.handleSubscription(m);
                     }
 
@@ -123,8 +126,11 @@ public class Robot implements Runnable {
     }
 
     private void handlePublishQueue() {
-        for (MqttMsg item: mqttHandler.outQueue) {
-            mqttHandler.publish(item.topic,item.message,item.QoS );
+        // Publish messages which are collected in the outgoing queue
+
+        for (MqttMsg item : mqttHandler.outQueue) {
+            MqttMsg m = mqttHandler.outQueue.poll();
+            mqttHandler.publish(m.topic, m.message, m.QoS);
         }
     }
 }
