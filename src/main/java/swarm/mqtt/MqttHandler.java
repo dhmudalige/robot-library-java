@@ -74,7 +74,8 @@ public class MqttHandler implements MqttCallback {
     }
 
     public void publish(String topic, String body, int qos) {
-        if (isConnected) {
+        if (isConnected && topic.length() > 0 && body.length() > 0) {
+            // Connected, non empty topic and body
 
             String t = channel + "/" + topic;  // prepare topic with message channel
             MqttMessage m = new MqttMessage(body.getBytes());
@@ -82,22 +83,29 @@ public class MqttHandler implements MqttCallback {
 
             try {
                 this.client.publish(t, m);
-                //System.out.println("Message " + m + ", published to " + t );
+                System.out.println("MQTT " + t + " >> " + "Message " + m);
 
             } catch (MqttException me) {
                 printMQTTError(me);
             }
         } else {
-            // Not connected
+            // TODO: Make a  warning
         }
     }
 
     public void subscribe(String topic) {
-        try {
-            client.subscribe(topic);
+        if (isConnected && topic.length() > 0) {
+            // connected and non empty topic
+            try {
+                String t = channel + "/" + topic;  // prepare topic with message channel
+                client.subscribe(t);
+                System.out.println("Subscribed to " + t);
 
-        } catch (MqttException me) {
-            printMQTTError(me);
+            } catch (MqttException me) {
+                printMQTTError(me);
+            }
+        } else {
+            // TODO: Make a warning
         }
     }
 
@@ -122,8 +130,13 @@ public class MqttHandler implements MqttCallback {
 
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
-        System.out.println("MQTT " + topic + ">> " + new String(message.getPayload()));
-        inQueue.add(new MqttMsg(topic, new String(message.getPayload())));
+        String t = topic.substring(topic.indexOf("/") + 1);
+        String msg = new String(message.getPayload());
+
+        if (msg.length() > 0) {
+            //System.out.println("Received " + topic + " >> " + new String(message.getPayload()));
+            inQueue.add(new MqttMsg(t, msg));
+        }
     }
 
     public MqttMsg inQueue() {
@@ -133,4 +146,6 @@ public class MqttHandler implements MqttCallback {
     public MqttMsg outQueue() {
         return this.outQueue.poll();
     }
+
+
 }

@@ -2,13 +2,17 @@ package swarm.robot.helpers;
 
 public class MotionController {
 
+
+    static final private double MAX_SPEED = 255;
+    static final private double MIN_SPEED = -255;
+
     static final private double RobotWidth = 8.75; // in cm
     static final private double WheelRadius = 3.5; // in cm
 
     static final private int maxInterval = 100; // This is the maximum interval allowed to coordinate calculation, smaller values increase the smoothness of the movement
     static final private double speedFactor = 1.0; // to be match with cm/s speed
 
-    private Coordinate c;
+    private final Coordinate c;
 
     public MotionController(Coordinate c) {
         this.c = c;
@@ -18,35 +22,32 @@ public class MotionController {
         move(leftSpeed, rightSpeed, maxInterval);
     }
 
-    // validate speeds to be between [-254, 255]
-    public boolean speedIsInRange(int speed){
-        if (-254 < speed && speed < 255) return true;
-        else return false;
-    }
-
     public void move(int leftSpeed, int rightSpeed, int interval) {
-        if(speedIsInRange(leftSpeed) && speedIsInRange(rightSpeed)){
-            System.out.println("Valid speed");
+        if(isSpeedInRange(leftSpeed) && isSpeedInRange(rightSpeed)) {
+
+            int steps = (int) Math.ceil((double) interval / maxInterval);
+            int stepInterval = interval / steps;
+
+            for (int j = 0; j < steps; j++) {
+                double dL = leftSpeed * speedFactor * (interval / 1000.0);
+                double dR = rightSpeed * speedFactor * (interval / 1000.0);
+                double d = (dL + dR) / 2.0;
+                double h = c.getHeadingRad();
+
+                double x = c.getX() + d * Math.cos(h);
+                double y = c.getY() + d * Math.sin(h);
+                double heading = (c.getHeadingRad() + (dR - dL) / RobotWidth); // in radians
+
+                c.setCoordinate(x, y, Math.toDegrees(heading));
+                //delay(stepInterval); // Adding a delay to make the movement in nearly realtime
+            }
+            c.print();
+            c.publishCoordinate(); // Publish to visualizer through MQTT
+
+        }else{
+            // TODO: Throw an error
+            System.out.println("Invalid speed");
         }
-
-        int steps = (int) Math.ceil((double) interval / maxInterval);
-        int stepInterval = interval / steps;
-
-        for (int j = 0; j < steps; j++) {
-            double dL = leftSpeed * speedFactor * (interval / 1000.0);
-            double dR = rightSpeed * speedFactor * (interval / 1000.0);
-            double d = (dL + dR) / 2.0;
-            double h = c.getHeadingRad();
-
-            double x = c.getX() + d * Math.cos(h);
-            double y = c.getY() + d * Math.sin(h);
-            double heading = (c.getHeadingRad() + (dR - dL) / RobotWidth); // in radians
-
-            c.setCoordinate(x, y, Math.toDegrees(heading));
-            //delay(stepInterval); // Adding a delay to make the movement in nearly realtime
-        }
-        c.print();
-        c.publishCoordinate(); // Publish to visualizer through MQTT
     }
 
     public boolean goToGoal(double targetX, double targetY, int velocity) {
@@ -54,7 +55,7 @@ public class MotionController {
     }
 
     public boolean goToGoal(double targetX, double targetY, int velocity, int interval) {
-        // TODO: implement this
+        // TODO: implement this ->  @NuwanJ
 
         double x = c.getX();
         double y = c.getY();
@@ -78,6 +79,11 @@ public class MotionController {
         //move((int) vL, (int) vR, interval);
 
         return (c.getX() == targetX && c.getY() == targetY);
+    }
+
+    // validate speeds to be between [-254, 255]
+    public boolean isSpeedInRange(int speed){
+        return MIN_SPEED <= speed && speed <= MAX_SPEED;
     }
 
     private double PID(double e) {
