@@ -12,6 +12,11 @@ import org.eclipse.paho.client.mqttv3.MqttCallback;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 
+class NotConnected extends Exception{
+    NotConnected(String s){
+        super(s);
+    }
+}
 
 public class MqttHandler implements MqttCallback {
     private MqttClient client;
@@ -89,7 +94,11 @@ public class MqttHandler implements MqttCallback {
                 printMQTTError(me);
             }
         } else {
-            // TODO: Make a  warning
+            try {
+                throw new NotConnected("Not Connected");
+            } catch (NotConnected notConnected) {
+                notConnected.printStackTrace();
+            }
         }
     }
 
@@ -105,7 +114,11 @@ public class MqttHandler implements MqttCallback {
                 printMQTTError(me);
             }
         } else {
-            // TODO: Make a warning
+            try {
+                throw new NotConnected("Not Connected");
+            } catch (NotConnected notConnected) {
+                notConnected.printStackTrace();
+            }
         }
     }
 

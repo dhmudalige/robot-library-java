@@ -1,5 +1,11 @@
 package swarm.robot.helpers;
 
+class InvalidSpeed extends Exception{
+    InvalidSpeed(String s){
+        super(s);
+    }
+}
+
 public class MotionController {
 
 
@@ -45,8 +51,11 @@ public class MotionController {
             c.publishCoordinate(); // Publish to visualizer through MQTT
 
         }else{
-            // TODO: Throw an error
-            System.out.println("Invalid speed");
+            try {
+                throw new InvalidSpeed("Invalid speed");
+            } catch (InvalidSpeed invalidSpeed) {
+                invalidSpeed.printStackTrace();
+            }
         }
     }
 
