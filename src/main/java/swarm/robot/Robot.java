@@ -1,136 +1,204 @@
 package swarm.robot;
 
-import swarm.mqtt.MqttHandler;
+import org.json.simple.parser.ParseException;
+import swarm.Interfaces.IRobotState;
+import swarm.configs.MQTTSettings;
+import swarm.mqtt.RobotMqttClient;
 import swarm.mqtt.MqttMsg;
-import swarm.patterns.CircularMove;
-import swarm.patterns.GoToGoal;
-import swarm.patterns.Pattern;
+import swarm.robot.communication.DirectedCommunication;
+import swarm.robot.communication.SimpleCommunication;
 import swarm.robot.helpers.Coordinate;
 import swarm.robot.helpers.MotionController;
+import swarm.robot.helpers.RobotMQTT;
+import swarm.robot.output.NeoPixel;
 import swarm.robot.sensors.DistanceSensor;
 
-public class Robot implements Runnable {
+public abstract class Robot implements Runnable, IRobotState {
 
-    // Sensors
-    private DistanceSensor distSensor;
-    private Pattern pattern;
+    // Sensors -----------------------------------------------------------
+    public DistanceSensor distSensor;
+    // TODO: implement color sensor
+    // public ColorSensor colorSensor;
+
+    // Communication -----------------------------------------------------
+    public SimpleCommunication simpleComm;
+    // TODO: Implement this as same as simpleCommunication, by changing the mqtt topics and subscription
+    public DirectedCommunication directedComm;
+
+    // Output ------------------------------------------------------------
+    public NeoPixel neoPixel;
+
+    // Helper and  Controller objects ------------------------------------
     public MotionController motion;
+    public RobotMQTT robotMQTT;
+    public Coordinate coordinates;
+    public RobotMqttClient robotMqttClient;
 
-    // Types
-    public enum RobotType {UNDEFINED, PHYSICAL, VIRTUAL}
 
-    public enum RobotState {IDEAL, MOVE}
-
-    // Variables
+    // Variables ---------------------------------------------------------
     protected int id;
-    protected Coordinate coordinates;
-    protected RobotType type;
+    protected char reality;
+    robotState state = robotState.WAIT;
 
-    public MqttHandler mqttHandler;
-
-    public Robot(int id, double x, double y, double heading) {
+    public Robot(int id, double x, double y, double heading, char reality) {
 
         this.id = id;
-        String channel = "v1";
+        this.reality = reality;
 
-        mqttHandler = new MqttHandler("68.183.188.135", 1883, "swarm_user", "swarm_usere15", channel);
-        coordinates = new Coordinate(id, x, y, heading, mqttHandler.outQueue);
+        robotMqttClient = new RobotMqttClient(MQTTSettings.server, MQTTSettings.port, MQTTSettings.userName, MQTTSettings.password, MQTTSettings.channel);
 
-        this.pattern = new CircularMove(this);
+        coordinates = new Coordinate(id, x, y, heading, robotMqttClient);
+        robotMQTT = new RobotMQTT(id, robotMqttClient, reality);
+
+        // Request to create a robot instance at Simulator
+        robotMQTT.robotCreate(coordinates.getX(), coordinates.getY(), coordinates.getHeading());
+
+        delay(1000);
+
         this.motion = new MotionController(coordinates);
-
-        //System.out.println(id + "> Robot object created !");
     }
 
     public void setup() {
-        //Subscribe to default topics
-        mqttHandler.subscribe("robot/msg/" + getId());
-        mqttHandler.subscribe("robot/msg/broadcast");
 
-        distSensor = new DistanceSensor(id, mqttHandler);
-        pattern.setup();
+        // Setup each module
+        distSensor = new DistanceSensor(id, robotMqttClient);
+        simpleComm = new SimpleCommunication(id, robotMqttClient);
+        directedComm = new DirectedCommunication(id, robotMqttClient);
+        neoPixel = new NeoPixel(id, robotMqttClient);
 
-        System.out.println(id + "> Robot setup completed !");
     }
 
     public void loop() {
-        //pattern.loop();
-        //coordinates.print();
-        delay(500);
+
     }
 
-    private void delay(int milliseconds) {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
-
-    // -----------------------------------------------------------------------------
+    // Robot getters and setters -----------------------------------------
 
     public int getId() {
         return this.id;
     }
 
-    public RobotType getType() {
-        return this.type;
-    }
-
+    // -------------------------------------------------------------------
 
     @Override
     public void run() {
         setup();
 
+        //noinspection InfiniteLoopStatement
         while (true) {
             loop();
-            handleSubscribeQueue();
-            handlePublishQueue();
+
+            // DO NOT REMOVE OR EDIT THIS DELAY
+            delay(1000);
+
+            try {
+                handleSubscribeQueue();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            // handlePublishQueue();
         }
     }
 
-    private void handleSubscribeQueue() {
+
+    // MQTT related methods ----------------------------------------------
+
+    private void handleSubscribeQueue() throws ParseException {
         // Handle the messages in incoming queue
 
-        for (MqttMsg item : mqttHandler.inQueue) {
-            MqttMsg m = mqttHandler.inQueue.poll();
+        for (MqttMsg item : robotMqttClient.inQueue) {
 
-            switch (m.topicGroups[0]) {
-                case "robot":
-                    // Robot messages
-                    System.out.println("Robot message received");
+            MqttMsg m = robotMqttClient.inQueue.poll();
 
-                    break;
-                case "sensor":
-                    // Sensor messages
+            if (m != null) {
+                switch (m.topicGroups[0]) {
+                    case "robot":
+                        // Robot messages
+                        // System.out.println("robot message received");
+                        robotMQTT.handleSubscription(this, m);
+                        break;
 
-                    if (m.topicGroups[1].equals("distance")) {
-                        // System.out.println("distance sensor message received");
-                        distSensor.handleSubscription(m);
-                    }
+                    case "sensor":
+                        // Sensor messages
 
-                    break;
-                case "localization":
-                    // Localization messages
-                    System.out.println("localization message received");
+                        if (m.topicGroups[1].equals("distance")) {
+                            // System.out.println("distance sensor message received");
+                            distSensor.handleSubscription(this, m);
+                        }
 
-                    break;
-                case "comm":
-                    // Communication messages
-                    System.out.println("communication message received");
+                        break;
+                    case "localization":
+                        // Localization messages
+                        System.out.println("localization message received");
 
-                    break;
+                        // TODO: localization update @NuwanJ
+                        if (m.topic.equals("localization/update/?")) {
+                            coordinates.handleSubscription(this, m);
+                        }
+
+                        break;
+                    case "comm":
+                        // Communication messages
+                        // System.out.println("communication message received");
+                        if (m.topicGroups[1].equals("simple")) {
+                            simpleComm.handleSubscription(this, m);
+                        }else{
+                            // directed
+                        }
+                        break;
+
+                    case "output":
+                        if ("NeoPixel".equals(m.topicGroups[1])) {
+                            neoPixel.handleSubscription(this, m);
+                        }
+                }
             }
         }
     }
-
     private void handlePublishQueue() {
         // Publish messages which are collected in the outgoing queue
 
-        for (MqttMsg item : mqttHandler.outQueue) {
-            MqttMsg m = mqttHandler.outQueue.poll();
-            mqttHandler.publish(m.topic, m.message, m.QoS);
+        for (MqttMsg item : robotMqttClient.outQueue) {
+            MqttMsg m = robotMqttClient.outQueue.poll();
+            assert m != null;
+            robotMqttClient.publish(m.topic, m.message, m.QoS);
         }
     }
+
+    // State Change methods, implement from IRobotState-------------------
+
+    @Override
+    public void start() {
+        System.out.println("pattern start on " + id);
+        state = robotState.RUN;
+    }
+
+    @Override
+    public void stop() {
+        System.out.println("pattern stop on " + id);
+        state = robotState.WAIT;
+    }
+
+    @Override
+    public void reset() {
+        System.out.println("pattern reset on " + id);
+        state = robotState.BEGIN;
+    }
+
+    @Override
+    public void execute() {
+
+    }
+
+    // Utility Methods ---------------------------------------------------
+
+    public void delay(int milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
 }

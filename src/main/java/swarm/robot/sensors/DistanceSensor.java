@@ -1,11 +1,12 @@
 package swarm.robot.sensors;
 
-import swarm.mqtt.MqttHandler;
+import swarm.mqtt.RobotMqttClient;
 
 import java.util.HashMap;
 
 import org.json.simple.JSONObject;
 import swarm.mqtt.MqttMsg;
+import swarm.robot.Robot;
 
 public class DistanceSensor extends AbstractSensor {
 
@@ -13,7 +14,10 @@ public class DistanceSensor extends AbstractSensor {
 
     private HashMap<mqttTopic, String> topicsSub = new HashMap<mqttTopic, String>();
 
-    public DistanceSensor(int robotId, MqttHandler m) {
+    private boolean dist_lock = false;
+    private int dist_value = 0;
+
+    public DistanceSensor(int robotId, RobotMqttClient m) {
         super(robotId, m);
         subscribe(mqttTopic.DISTANCE_IN, "sensor/distance/" + robotId);
         subscribe(mqttTopic.DISTANCE_LOOK, "sensor/distance/" + robotId + "/?");
@@ -21,20 +25,25 @@ public class DistanceSensor extends AbstractSensor {
 
     private void subscribe(mqttTopic key, String topic) {
         topicsSub.put(key, topic);      // Put to the queue
-        mqttHandler.subscribe(topic);   // Subscribe through MqttHandler
+        robotMqttClient.subscribe(topic);   // Subscribe through MqttHandler
     }
 
     @Override
-    public void handleSubscription(MqttMsg m) {
+    public void handleSubscription(Robot robot, MqttMsg m) {
         // sensor/distance/
         String topic = m.topic;
         String msg = m.message;
 
         if (topic.equals(topicsSub.get(mqttTopic.DISTANCE_IN))) {
             // sensor/distance/{id}
-            System.out.println("Received: " + topic + "> " + msg);
+            dist_lock = false;
+            dist_value = Integer.parseInt(msg);
+
+            // robot.sensorInterrupt("distance", msg);
 
         } else if (topic.equals(topicsSub.get(mqttTopic.DISTANCE_LOOK))) {
+            // TODO: What we need to do in here ?
+
             // sensor/distance/{id}/?
             System.out.println("Received: " + topic + "> " + msg);
 
@@ -46,10 +55,18 @@ public class DistanceSensor extends AbstractSensor {
 
     public float getDistance() {
         // TODO: implement a blocking call for this. -> @NuwanJ
+        // This is a blocking call
         // Publish to v1/sensor/distance/ -> {id: this.id}
-        // Wait until message received to v1/sensor/distance/{this.id}
+        // Wait until message received to v1/sensor/distance/{robotId}
+        dist_lock = true;
 
-        return 0;
+        robotMqttClient.publish("v1/sensor/distance", Integer.toString(robotId));
+        while (dist_lock != false) {
+            // TODO: add some timeout to avoid a lock
+            // Need to execute MQTT Subscription Queue during this loop
+        }
+
+        return dist_value;
     }
 
     public void sendDistance(double d) {
@@ -59,10 +76,7 @@ public class DistanceSensor extends AbstractSensor {
         obj.put("id", robotId);
         obj.put("dist", d);
 
-        mqttHandler.publish("sensor/distance/", obj.toJSONString());
+        robotMqttClient.publish("sensor/distance/", obj.toJSONString());
     }
 
-    public HashMap<mqttTopic, String> topicsSub() {
-        return topicsSub;
-    }
 }
