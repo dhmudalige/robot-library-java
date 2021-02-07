@@ -9,17 +9,19 @@ public abstract class AbstractSensor implements IMqttHandler {
 
     protected RobotMqttClient robotMqttClient;
     protected int robotId;
+    protected Robot robot;
 
-    public AbstractSensor(int robotId, RobotMqttClient m) {
+    public AbstractSensor(Robot robot, RobotMqttClient m) {
         this.robotMqttClient = m;
-        this.robotId = robotId;
+        this.robotId = robot.getId();
+        this.robot = robot;
     }
 
     private void subscribe(String topic) {
         // This will subscribe to a given topic through mqttHandler
     }
 
-    public void handleSubscription(Robot r,MqttMsg m) {
+    public void handleSubscription(Robot r, MqttMsg m) {
         //  This will handle incoming messages with already subscribed topics
     }
 

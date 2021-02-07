@@ -10,7 +10,7 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import swarm.robot.Exception.MqttClientException;
+import swarm.robot.exception.MqttClientException;
 
 public class RobotMqttClient implements MqttCallback {
     private MqttClient client;
@@ -82,7 +82,7 @@ public class RobotMqttClient implements MqttCallback {
 
             try {
                 this.client.publish(t, m);
-                System.out.println("MQTT " + t + " >> " + "Message " + m);
+                // System.out.println("MQTT " + t + " >> " + "Message " + m);
 
             } catch (org.eclipse.paho.client.mqttv3.MqttException me) {
                 printMQTTError(me);

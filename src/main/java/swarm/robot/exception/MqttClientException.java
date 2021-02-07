@@ -1,7 +1,7 @@
-package swarm.robot.Exception;
+package swarm.robot.exception;
 
 public class MqttClientException extends Exception{
     public MqttClientException(String s){
-        super(s);
+        System.out.println("MQTT Error: " + s);
     }
 }

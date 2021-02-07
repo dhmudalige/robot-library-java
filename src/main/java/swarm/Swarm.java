@@ -11,7 +11,7 @@ public class Swarm extends Thread {
         int[] robotList = {3};
 
         // Linear Robot Formation
-        lineFormation(robotList, -105, 0, 90, 35, 0);
+        lineFormation(robotList, -75, 75, 90, 35, 0);
 
         // Circular Robot formation
         //circularFormation(robotList, 0, 0, 90, 60, 0, 45);
@@ -22,10 +22,10 @@ public class Swarm extends Thread {
     }
 
     private static void lineFormation(int[] robotList, int startX, int startY, int heading, int incX, int incY) {
-        Robot[] vr = new ColorRippleRobot[robotList.length];
+        Robot[] vr = new VirtualRobot[robotList.length];
 
         for (int i = 0; i < robotList.length; i++) {
-            vr[i] = new ColorRippleRobot(robotList[i], startX + incX * i, startY + incY * i, heading);
+            vr[i] = new MoveRobot(robotList[i], startX + incX * i, startY + incY * i, heading);
             new Thread(vr[i]).start();
         }
     }

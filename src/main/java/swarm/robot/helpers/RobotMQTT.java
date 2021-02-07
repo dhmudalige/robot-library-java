@@ -66,6 +66,8 @@ public class RobotMQTT {
                     obj.put("id", robotId);
                     obj.put("reality", "V");
                     robotMqttClient.publish("robot/live", obj.toJSONString());
+                    System.out.println("robot/live > " + obj.toJSONString());
+
                     break;
 
                 case "START":

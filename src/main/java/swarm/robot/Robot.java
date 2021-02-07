@@ -61,14 +61,14 @@ public abstract class Robot implements Runnable, IRobotState {
     public void setup() {
 
         // Setup each module
-        distSensor = new DistanceSensor(id, robotMqttClient);
+        distSensor = new DistanceSensor(this, robotMqttClient);
         simpleComm = new SimpleCommunication(id, robotMqttClient);
         directedComm = new DirectedCommunication(id, robotMqttClient);
         neoPixel = new NeoPixel(id, robotMqttClient);
 
     }
 
-    public void loop() {
+    public void loop() throws Exception {
 
     }
 
@@ -86,7 +86,11 @@ public abstract class Robot implements Runnable, IRobotState {
 
         //noinspection InfiniteLoopStatement
         while (true) {
-            loop();
+            try {
+                loop();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             // DO NOT REMOVE OR EDIT THIS DELAY
             delay(1000);
@@ -104,7 +108,7 @@ public abstract class Robot implements Runnable, IRobotState {
 
     // MQTT related methods ----------------------------------------------
 
-    private void handleSubscribeQueue() throws ParseException {
+    public void handleSubscribeQueue() throws ParseException {
         // Handle the messages in incoming queue
 
         for (MqttMsg item : robotMqttClient.inQueue) {

@@ -4,7 +4,7 @@ public interface IRobotState
 {
     enum robotState {WAIT, RUN, BEGIN}
 
-    public void loop();
+    public void loop() throws Exception;
     public void execute();
 
     public void interrupt();

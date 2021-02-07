@@ -1,13 +1,13 @@
 package swarm.robot.helpers;
 
 import swarm.configs.RobotSettings;
-import swarm.robot.Exception.MotionControllerException;
+import swarm.robot.exception.MotionControllerException;
 
 
 public class MotionController {
 
     static final private int maxInterval = 100; // This is the maximum interval allowed to coordinate calculation, smaller values increase the smoothness of the movement
-    static final private double speedFactor = 0.2; // to be match with cm/s speed
+    static final private double speedFactor = 0.05; // to be match with cm/s speed
 
     private final Coordinate c;
 
@@ -15,19 +15,34 @@ public class MotionController {
         this.c = c;
     }
 
+    // Simplified functions --------------
+
+    public void rotate(int speed) {
+        rotate(speed, 1000);
+    }
+
+    public void rotate(int speed, int interval) {
+        move(speed, -1 * speed, interval);
+    }
+
     public void move(int leftSpeed, int rightSpeed) {
         move(leftSpeed, rightSpeed, maxInterval);
     }
+
+    // -----------------------------------
 
     public void move(int leftSpeed, int rightSpeed, int interval) {
         if (isSpeedInRange(leftSpeed) && isSpeedInRange(rightSpeed)) {
 
             int steps = (int) Math.ceil((double) interval / maxInterval);
             int stepInterval = interval / steps;
+            int cumulativeInterval = 0;
+
+            debug("Move using " + steps + " steps, each has " + stepInterval + " intervals");
 
             for (int j = 0; j < steps; j++) {
-                double dL = leftSpeed * speedFactor * (interval / 1000.0);
-                double dR = rightSpeed * speedFactor * (interval / 1000.0);
+                double dL = leftSpeed * speedFactor * (stepInterval / 1000.0);
+                double dR = rightSpeed * speedFactor * (stepInterval / 1000.0);
                 double d = (dL + dR) / 2.0;
                 double h = c.getHeadingRad();
 
@@ -35,22 +50,33 @@ public class MotionController {
                 double y = c.getY() + d * Math.sin(h);
                 double heading = (c.getHeadingRad() + (dR - dL) / (RobotSettings.ROBOT_WIDTH)); // in radians
 
-                //double dist = Math.sqrt(Math.pow(x - c.getX(), 2) + Math.pow(y - c.getY(), 2));
-                //double speed = ((leftSpeed + rightSpeed) / 2.0) * speedFactor;
-                //int time = (int) (1000 * dist / speed); // time in ms
-                //System.out.println("dist:" + dist + " time:" + time + " speed:"  + speed);
-                //delay(time);
+//                double dist = Math.sqrt(Math.pow(x - c.getX(), 2) + Math.pow(y - c.getY(), 2));
+//                double speed = ((leftSpeed + rightSpeed) / 2.0) * speedFactor;
+//                int time = (int) (1000 * dist / speed); // time in ms
+//                System.out.println("dist:" + dist + " time:" + time + " speed:"  + speed);
+//                delay(time);
 
                 c.setCoordinate(x, y, Math.toDegrees(heading));
 
-                //delay(stepInterval); // Adding a delay to make the movement in nearly realtime
+                // Any two coordinate transmissions should have a gap of 1000ms
+                // (An requirement form the visualizer)
+                cumulativeInterval += stepInterval;
+
+                if (cumulativeInterval >= 2000) {
+                    debug("Adding extra delay, " + cumulativeInterval);
+
+                    //c.print();
+                    c.publishCoordinate();
+                    delay(cumulativeInterval - 1000);
+                    cumulativeInterval -= 1000;
+                }
             }
             c.print();
             c.publishCoordinate(); // Publish to visualizer through MQTT
 
         } else {
             try {
-                throw new MotionControllerException("Invalid speed");
+                throw new MotionControllerException("One of the provided speeds is out of range in move() function");
             } catch (MotionControllerException motionControllerException) {
                 motionControllerException.printStackTrace();
             }
@@ -72,7 +98,7 @@ public class MotionController {
         double phiD = Math.atan2(dy, dx);
         double w = 0.2 * (phiD - heading);
 
-        System.out.println("dx:" + dx + " dy:" + dy + " head:" + Math.toDegrees(heading) + " w:" + Math.toDegrees(w) + " phiD:" + phiD);
+        debug("dx:" + dx + " dy:" + dy + " head:" + Math.toDegrees(heading) + " w:" + Math.toDegrees(w) + " phiD:" + phiD);
 
         c.setX(x + 5 * Math.cos(w));
         c.setY(y + 5 * Math.sin(w));
@@ -109,6 +135,15 @@ public class MotionController {
         double dx = x2 - x1;
         double dy = y2 - y1;
         return Math.toDegrees(Math.atan2(dy, dx));
+    }
+
+    public static void debug(String msg) {
+        debug(msg,0);
+    }
+    public static void debug(String msg, int level) {
+        if(level > 1) {
+            System.out.println(msg);
+        }
     }
 
 }

@@ -20,7 +20,7 @@ public class ColorRippleRobot extends VirtualRobot {
     }
 
     @Override
-    public void loop() {
+    public void loop() throws Exception {
         super.loop();
 
         // Anything specially check in continuously
