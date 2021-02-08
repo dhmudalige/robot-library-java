@@ -1,25 +1,27 @@
 package swarm.robot.sensors;
 
-import swarm.mqtt.MqttHandler;
+import swarm.Interfaces.IMqttHandler;
+import swarm.mqtt.RobotMqttClient;
 import swarm.mqtt.MqttMsg;
+import swarm.robot.Robot;
 
-import java.util.HashMap;
+public abstract class AbstractSensor implements IMqttHandler {
 
-public abstract class AbstractSensor {
-
-    protected MqttHandler mqttHandler;
+    protected RobotMqttClient robotMqttClient;
     protected int robotId;
+    protected Robot robot;
 
-    public AbstractSensor(int robotId, MqttHandler m) {
-        this.mqttHandler = m;
-        this.robotId = robotId;
+    public AbstractSensor(Robot robot, RobotMqttClient m) {
+        this.robotMqttClient = m;
+        this.robotId = robot.getId();
+        this.robot = robot;
     }
 
     private void subscribe(String topic) {
         // This will subscribe to a given topic through mqttHandler
     }
 
-    public void handleSubscription(MqttMsg m) {
+    public void handleSubscription(Robot r, MqttMsg m) {
         //  This will handle incoming messages with already subscribed topics
     }
 

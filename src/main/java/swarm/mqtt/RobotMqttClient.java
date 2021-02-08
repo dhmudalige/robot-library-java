@@ -4,21 +4,15 @@ import java.util.*;
 
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import swarm.robot.exception.MqttClientException;
 
-class NotConnected extends Exception{
-    NotConnected(String s){
-        super(s);
-    }
-}
-
-public class MqttHandler implements MqttCallback {
+public class RobotMqttClient implements MqttCallback {
     private MqttClient client;
     private boolean isConnected = false;
 
@@ -32,7 +26,7 @@ public class MqttHandler implements MqttCallback {
 
     // Documentation: https://www.eclipse.org/paho/files/javadoc/index.html
 
-    public MqttHandler(String server, int port, String userName, String password, String channel) {
+    public RobotMqttClient(String server, int port, String userName, String password, String channel) {
 
         this.server = server;
         this.port = port;
@@ -64,7 +58,7 @@ public class MqttHandler implements MqttCallback {
 
             System.out.println("MQTT: Connected");
 
-        } catch (MqttException me) {
+        } catch (org.eclipse.paho.client.mqttv3.MqttException me) {
             System.out.println("reason " + me.getReasonCode());
             System.out.println("msg " + me.getMessage());
             System.out.println("loc " + me.getLocalizedMessage());
@@ -88,16 +82,16 @@ public class MqttHandler implements MqttCallback {
 
             try {
                 this.client.publish(t, m);
-                System.out.println("MQTT " + t + " >> " + "Message " + m);
+                // System.out.println("MQTT " + t + " >> " + "Message " + m);
 
-            } catch (MqttException me) {
+            } catch (org.eclipse.paho.client.mqttv3.MqttException me) {
                 printMQTTError(me);
             }
         } else {
             try {
-                throw new NotConnected("Not Connected");
-            } catch (NotConnected notConnected) {
-                notConnected.printStackTrace();
+                throw new MqttClientException("Not Connected");
+            } catch (MqttClientException mqttClientException) {
+                mqttClientException.printStackTrace();
             }
         }
     }
@@ -110,19 +104,19 @@ public class MqttHandler implements MqttCallback {
                 client.subscribe(t);
                 System.out.println("Subscribed to " + t);
 
-            } catch (MqttException me) {
+            } catch (org.eclipse.paho.client.mqttv3.MqttException me) {
                 printMQTTError(me);
             }
         } else {
             try {
-                throw new NotConnected("Not Connected");
-            } catch (NotConnected notConnected) {
-                notConnected.printStackTrace();
+                throw new MqttClientException("Not Connected");
+            } catch (MqttClientException mqttClientException) {
+                mqttClientException.printStackTrace();
             }
         }
     }
 
-    private void printMQTTError(MqttException me) {
+    private void printMQTTError(org.eclipse.paho.client.mqttv3.MqttException me) {
         System.out.println("reason " + me.getReasonCode());
         System.out.println("msg " + me.getMessage());
         System.out.println("loc " + me.getLocalizedMessage());

@@ -3,29 +3,49 @@ package swarm.robot.helpers;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
 
+import swarm.Interfaces.IMqttHandler;
+import swarm.mqtt.RobotMqttClient;
 import swarm.mqtt.MqttMsg;
-import java.util.Queue;
+import swarm.robot.Robot;
 
-public class Coordinate {
+import java.util.HashMap;
+
+public class Coordinate implements IMqttHandler {
 
     private double x, y, heading;
-    private final Queue<MqttMsg> mqttPublish;
+    protected RobotMqttClient robotMqttClient;
     private final int robotId;
 
-    public Coordinate(int robotId, double x, double y, double heading, Queue<MqttMsg> mqtt) {
+    private enum mqttTopic {ROBOT_LOCALIZATION}
+    private final HashMap<mqttTopic, String> topicsSub = new HashMap<mqttTopic, String>();
+
+    public Coordinate(int robotId, double x, double y, double heading, RobotMqttClient m) {
         this.x = x;
         this.y = y;
         this.heading = heading;
         this.robotId = robotId;
-        this.mqttPublish = mqtt;
+        this.robotMqttClient = m;
+
+        subscribe(mqttTopic.ROBOT_LOCALIZATION, "localization/update/?");
+    }
+
+    private void subscribe(mqttTopic key, String topic) {
+        topicsSub.put(key, topic);      // Put to the queue
+        robotMqttClient.subscribe(topic);   // Subscribe through MqttHandler
+    }
+
+    public void handleSubscription(Robot r, MqttMsg m) {
+        String topic = m.topic;
+        String msg = m.message;
+
+        if (topic.equals(topicsSub.get(mqttTopic.ROBOT_LOCALIZATION))) {
+            System.out.println("publishing the localization data of robot " + robotId);
+            publishCoordinate();
+        }
     }
 
     public double getX() {
         return this.x;
-    }
-
-    public void setX(double x) {
-        this.x = x;
     }
 
     public double getY() {
@@ -34,6 +54,10 @@ public class Coordinate {
 
     public void setY(double y) {
         this.y = y;
+    }
+
+    public void setX(double x) {
+        this.x = x;
     }
 
     public double getHeading() {
@@ -45,10 +69,12 @@ public class Coordinate {
     }
 
     public void setHeading(double heading) {
-        this.heading = getNormalizedHeading(heading); // heading between [180,-180)
+        // heading between [180,-180)
+        this.heading = getNormalizedHeading(heading);
     }
 
     public void setHeadingRad(double heading) {
+        // translate to degrees and store
         setHeading(Math.toDegrees(heading));
     }
 
@@ -58,8 +84,7 @@ public class Coordinate {
     }
 
     public void setCoordinate(double x, double y, double heading) {
-        setX(x);
-        setY(y);
+        setCoordinate(x, y);
         setHeading(heading);
     }
 
@@ -72,22 +97,28 @@ public class Coordinate {
     }
 
     public void publishCoordinate() {
-        JSONArray jsonArray = new JSONArray();
-        JSONObject obj = new JSONObject();
-        obj.put("id", robotId);
-        obj.put("x", round2(x));
-        obj.put("y", round2(y));
-        obj.put("heading", round2(heading));
 
-        jsonArray.add(obj);
-        mqttPublish.add(new MqttMsg("localization/info", jsonArray.toJSONString()));
+        JSONObject coord = new JSONObject();
+        coord.put("id", robotId);
+        coord.put("x", getX());
+        coord.put("y", getY());
+        coord.put("heading", getHeading());
+        coord.put("reality", "V");
+
+        JSONArray data = new JSONArray();
+        data.add(coord);
+
+        robotMqttClient.publish("localization/update", data.toString());
     }
+
+    // Helper functions -----------------------------------------------------
 
     private double round2(double x) {
         return Math.round(x * 100) / 100.0;
     }
 
     private double getNormalizedHeading(double heading) {
+        // TODO: Test the correctness of this function
         double h = (heading + 180) % 360;
         if (h <= 0) h += 360;
         h = h - 180;
