@@ -1,11 +1,21 @@
 package swarm.robot.communication;
 
-public abstract class Communication {
+import swarm.Interfaces.IMqttHandler;
+import swarm.mqtt.RobotMqttClient;
+import swarm.robot.helpers.Coordinate;
 
-    public Communication(){
+import java.util.HashMap;
 
+public abstract class Communication implements IMqttHandler {
+    protected RobotMqttClient robotMqttClient;
+    protected int robotId;
+
+    public Communication(int robotId, RobotMqttClient m){
+        this.robotMqttClient = m;
+        this.robotId = robotId;
     }
 
+    void subscribe(String topic) {
 
-
+    }
 }
