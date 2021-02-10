@@ -93,7 +93,8 @@ public abstract class Robot implements Runnable, IRobotState {
             }
 
             // DO NOT REMOVE OR EDIT THIS DELAY
-            delay(1000);
+            // 1000 - mqttPacketDelay
+            delay(900);
 
             try {
                 handleSubscribeQueue();

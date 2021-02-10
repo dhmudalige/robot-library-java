@@ -44,7 +44,7 @@ public class DistanceSensor extends AbstractSensor {
 
             // TODO: Handle Infinity
             if (msg.compareTo("Infinity") == 0) {
-                dist_value = 0;
+                dist_value = Double.POSITIVE_INFINITY;
             } else {
                 dist_value = Double.parseDouble(msg);
             }
@@ -84,7 +84,6 @@ public class DistanceSensor extends AbstractSensor {
         long stratTime = System.currentTimeMillis();
         boolean timeout = false;
 
-        // TODO: add some timeout to avoid a lock
         while (dist_lock && !timeout) {
             try {
                 robot.handleSubscribeQueue();
