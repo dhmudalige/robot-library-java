@@ -44,7 +44,7 @@ public class DistanceSensor extends AbstractSensor {
 
             // TODO: Handle Infinity
             if (msg.compareTo("Infinity") == 0) {
-                dist_value = Double.POSITIVE_INFINITY;
+                dist_value = -1; // Double.POSITIVE_INFINITY;
             } else {
                 dist_value = Double.parseDouble(msg);
             }

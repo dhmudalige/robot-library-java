@@ -8,7 +8,7 @@ import swarm.robotImplementations.MoveRobot;
 public class Swarm extends Thread {
     public static void main(String[] args) {
 
-        int[] robotList = {4};
+        int[] robotList = {6,7,8,9};
 
         // Linear Robot Formation
         lineFormation(robotList, -75, 75, 90, 35, 0);
