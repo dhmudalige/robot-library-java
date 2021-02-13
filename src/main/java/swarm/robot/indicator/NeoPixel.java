@@ -59,7 +59,6 @@ public class NeoPixel extends AbstractOutput {
     }
 
     public void changeColor(int r, int g, int b){
-        // TODO: Validate r,g,b to be between [0,255] @DDilshani
         try {
             throw new IndicatorException(r,g,b);
         } catch (IndicatorException e) {

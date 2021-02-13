@@ -11,14 +11,14 @@ import swarm.robot.helpers.Coordinate;
 import swarm.robot.helpers.MotionController;
 import swarm.robot.helpers.RobotMQTT;
 import swarm.robot.indicator.NeoPixel;
+import swarm.robot.sensors.ColorSensor;
 import swarm.robot.sensors.DistanceSensor;
 
 public abstract class Robot implements Runnable, IRobotState {
 
     // Sensors -----------------------------------------------------------
     public DistanceSensor distSensor;
-    // TODO: implement color sensor
-    // public ColorSensor colorSensor;
+    // ColorSensor colorSensor;
 
     // Communication -----------------------------------------------------
     public SimpleCommunication simpleComm;
