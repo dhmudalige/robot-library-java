@@ -10,7 +10,7 @@ import swarm.robot.communication.SimpleCommunication;
 import swarm.robot.helpers.Coordinate;
 import swarm.robot.helpers.MotionController;
 import swarm.robot.helpers.RobotMQTT;
-import swarm.robot.output.NeoPixel;
+import swarm.robot.indicator.NeoPixel;
 import swarm.robot.sensors.DistanceSensor;
 
 public abstract class Robot implements Runnable, IRobotState {
