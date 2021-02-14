@@ -7,12 +7,11 @@ import java.util.HashMap;
 
 import org.json.simple.JSONObject;
 import swarm.mqtt.MqttMsg;
-import swarm.robot.exception.RGBColorException;
 import swarm.robot.exception.SensorException;
 import swarm.robot.Robot;
 import swarm.robot.types.RGBColorType;
 
-public class ColorSensor<array, col_value> extends AbstractSensor {
+public class ColorSensor extends AbstractSensor {
 
     private final static int MQTT_TIMEOUT = 1000;
 
@@ -21,11 +20,10 @@ public class ColorSensor<array, col_value> extends AbstractSensor {
     private HashMap<mqttTopic, String> topicsSub = new HashMap<mqttTopic, String>();
 
     private boolean col_lock = false;
-    int r_value = 0,g_value = 0,b_value = 0;
 
-    RGBColorType color = new RGBColorType(0,0,0);
+    RGBColorType color;
 
-    public ColorSensor(Robot robot, RobotMqttClient m) throws RGBColorException {
+    public ColorSensor(Robot robot, RobotMqttClient m) {
         super(robot, m);
         subscribe(mqttTopic.COLOR_IN, "sensor/color/" + robotId);
         subscribe(mqttTopic.COLOR_LOOK, "sensor/color/" + robotId + "/?");
@@ -37,7 +35,7 @@ public class ColorSensor<array, col_value> extends AbstractSensor {
     }
 
     @Override
-    public void handleSubscription(Robot robot, MqttMsg m) throws RGBColorException {
+    public void handleSubscription(Robot robot, MqttMsg m) {
         // sensor/color/
         String topic = m.topic;
         String msg = m.message;
@@ -47,37 +45,27 @@ public class ColorSensor<array, col_value> extends AbstractSensor {
             // TODO: Only for testing
             System.out.println("Color Input>" + msg);
 
+            String[] arrSplit = msg.split(" ");
+            color.setColor(Integer.parseInt(arrSplit[0]), Integer.parseInt(arrSplit[1]), Integer.parseInt(arrSplit[2]));
 
-            if (msg.compareTo("Infinity") == 0) {
-                // TODO: Handle Infinity
-                // 0 will be returned as a fail-proof option. Should throw an exception
-                color.setColor(-1,-1,-1);
-            } else {
-                String[] arrSplit = msg.split(" ");
-                color.setColor(Integer.parseInt(arrSplit[0]),Integer.parseInt(arrSplit[1]),Integer.parseInt(arrSplit[2]));
-            }
             col_lock = false;
-            // robot.sensorInterrupt(color.colorToString());
+            // robot.sensorInterrupt(color.toString());
 
         } else if (topic.equals(topicsSub.get(mqttTopic.COLOR_LOOK))) {
             // TODO: What we need to do in here ?
-
             // sensor/color/{id}/?
-            System.out.println("Received: " + topic + "> " + color.colorToString());
+            System.out.println("Received: " + topic + "> " + color.toString());
 
         } else {
-            System.out.println("Received (unknown): " + topic + "> " + color.colorToString());
+            System.out.println("Received (unknown): " + topic + "> " + color.toString());
         }
 
     }
 
-    // TODO: implement a RGBColor Class and use is as the return type
-    public int[] getColor() throws Exception {
+    public RGBColorType getColor() throws Exception {
         // Publish to sensor/color/ -> {id: this.id}
         // Listen to sensor/color/{robotId} -> color
         // return the reading
-
-
 
         // Prepare the message
         JSONObject msg = new JSONObject();
@@ -109,8 +97,9 @@ public class ColorSensor<array, col_value> extends AbstractSensor {
             throw new SensorException("Color sensor timeout");
         }
 
-        System.out.println(color.colorToString());
-        return color.getColor();
+        System.out.println(color.toString());
+
+        return color;
     }
 
     public void sendColor(int r, int g, int b, int ambient) {

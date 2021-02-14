@@ -22,7 +22,7 @@ public abstract class AbstractSensor implements IMqttHandler {
         // This will subscribe to a given topic through mqttHandler
     }
 
-    public void handleSubscription(Robot r, MqttMsg m) throws RGBColorException {
+    public void handleSubscription(Robot r, MqttMsg m) {
         //  This will handle incoming messages with already subscribed topics
     }
 

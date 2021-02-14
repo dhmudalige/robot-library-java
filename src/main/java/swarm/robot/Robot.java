@@ -63,9 +63,10 @@ public abstract class Robot implements Runnable, IRobotState {
         // Setup each module
         distSensor = new DistanceSensor(this, robotMqttClient);
         colorSensor = new ColorSensor(this, robotMqttClient);
+        neoPixel = new NeoPixel(this, robotMqttClient);
+
         simpleComm = new SimpleCommunication(id, robotMqttClient);
         directedComm = new DirectedCommunication(id, robotMqttClient);
-        neoPixel = new NeoPixel(id, robotMqttClient);
 
     }
 

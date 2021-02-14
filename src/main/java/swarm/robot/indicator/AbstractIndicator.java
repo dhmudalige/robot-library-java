@@ -6,20 +6,23 @@ import swarm.mqtt.MqttMsg;
 import swarm.robot.Robot;
 import swarm.robot.exception.RGBColorException;
 
-public abstract class AbstractOutput {
+public abstract class AbstractIndicator {
     protected RobotMqttClient robotMqttClient;
     protected int robotId;
+    protected Robot robot;
 
-    public AbstractOutput(int robotId, RobotMqttClient m) {
+    public AbstractIndicator(Robot robot, RobotMqttClient m) {
         this.robotMqttClient = m;
-        this.robotId = robotId;
+        this.robotId = robot.getId();
+        this.robot = robot;
     }
 
-    // This will subscribe to a given topic through mqttHandler
-    protected abstract void subscribe(String topic);
+    private void subscribe(String topic) {
+        // This will subscribe to a given topic through mqttHandler
+    }
 
     //  This will handle incoming messages with already subscribed topics
-    public abstract void handleSubscription(Robot r,MqttMsg m) throws ParseException, RGBColorException;
+    public abstract void handleSubscription(Robot r,MqttMsg m) throws ParseException;
 
 
 }
