@@ -1,4 +1,4 @@
-package swarm.robot.output;
+package swarm.robot.indicator;
 
 import org.json.simple.parser.ParseException;
 import swarm.mqtt.RobotMqttClient;

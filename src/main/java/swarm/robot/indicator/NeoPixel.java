@@ -1,4 +1,4 @@
-package swarm.robot.output;
+package swarm.robot.indicator;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -6,6 +6,7 @@ import org.json.simple.parser.ParseException;
 import swarm.mqtt.RobotMqttClient;
 import swarm.mqtt.MqttMsg;
 import swarm.robot.Robot;
+import swarm.robot.exception.IndicatorException;
 
 import java.util.HashMap;
 
@@ -57,8 +58,13 @@ public class NeoPixel extends AbstractOutput {
         }
     }
 
-    public void changeColor(int r, int g, int b) {
-        // TODO: Validate r,g,b to be between [0,255] @DDilshani
+    public void changeColor(int r, int g, int b){
+        try {
+            throw new IndicatorException(r,g,b);
+        } catch (IndicatorException e) {
+            e.printStackTrace();
+        }
+
         R = r;
         G = g;
         B = b;
