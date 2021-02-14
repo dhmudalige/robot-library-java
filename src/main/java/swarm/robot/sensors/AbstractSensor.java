@@ -4,6 +4,7 @@ import swarm.Interfaces.IMqttHandler;
 import swarm.mqtt.RobotMqttClient;
 import swarm.mqtt.MqttMsg;
 import swarm.robot.Robot;
+import swarm.robot.exception.RGBColorException;
 
 public abstract class AbstractSensor implements IMqttHandler {
 

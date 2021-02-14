@@ -8,7 +8,7 @@ import swarm.robotImplementations.MoveRobot;
 public class Swarm extends Thread {
     public static void main(String[] args) {
 
-        int[] robotList = {3};
+        int[] robotList = {6,7,8,9};
 
         // Linear Robot Formation
         lineFormation(robotList, -75, 75, 90, 35, 0);
@@ -25,7 +25,7 @@ public class Swarm extends Thread {
         Robot[] vr = new VirtualRobot[robotList.length];
 
         for (int i = 0; i < robotList.length; i++) {
-            vr[i] = new MoveRobot(robotList[i], startX + incX * i, startY + incY * i, heading);
+            vr[i] = new ColorRippleRobot(robotList[i], startX + incX * i, startY + incY * i, heading);
             new Thread(vr[i]).start();
         }
     }
@@ -41,7 +41,7 @@ public class Swarm extends Thread {
             y = (int) (radius * Math.sin(a * Math.PI / 180));
             robotHeading = (int) (a + headingOffset);
 
-            vr[i] = new VirtualRobot(robotList[i], x, y, robotHeading);
+            vr[i] = new ColorRippleRobot(robotList[i], x, y, robotHeading);
             new Thread(vr[i]).start();
         }
 

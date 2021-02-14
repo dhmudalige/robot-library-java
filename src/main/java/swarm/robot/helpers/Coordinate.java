@@ -10,6 +10,8 @@ import swarm.robot.Robot;
 
 import java.util.HashMap;
 
+import static java.lang.Math.ceil;
+
 public class Coordinate implements IMqttHandler {
 
     private double x, y, heading;
@@ -118,10 +120,11 @@ public class Coordinate implements IMqttHandler {
     }
 
     private double getNormalizedHeading(double heading) {
-        // TODO: Test the correctness of this function
-        double h = (heading + 180) % 360;
+        /*double h = (heading + 180) % 360;
         if (h <= 0) h += 360;
-        h = h - 180;
+        h = h - 180;*/
+
+        double h = heading - ceil(heading / 360 - 0.5) * 360;
         return h;
     }
 
