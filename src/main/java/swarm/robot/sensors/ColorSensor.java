@@ -19,7 +19,7 @@ public class ColorSensor<array, col_value> extends AbstractSensor {
     private HashMap<mqttTopic, String> topicsSub = new HashMap<mqttTopic, String>();
 
     private boolean col_lock = false;
-    double r_value=0, g_value=0, b_value=0;
+    int r_value = 0,g_value = 0,b_value = 0;
 
     public ColorSensor(Robot robot, RobotMqttClient m) {
         super(robot, m);
@@ -40,38 +40,38 @@ public class ColorSensor<array, col_value> extends AbstractSensor {
 
         if (topic.equals(topicsSub.get(mqttTopic.COLOR_IN))) {
             // sensor/color/{id}
-            //System.out.println("Input>" + col_msg);------------------------------
+            // TODO: Only for testing
+            System.out.println("Color Input>" + msg);
 
-            // TODO: Handle Infinity
+
             if (msg.compareTo("Infinity") == 0) {
-                // -1 will be returned as a fail-proof option. Should throw an exception
-                r_value=-1; //Double.POSITIVE_INFINITY;
-                g_value=-1; //Double.POSITIVE_INFINITY;
-                b_value=-1; //Double.POSITIVE_INFINITY;
+                // TODO: Handle Infinity
+                // 0 will be returned as a fail-proof option. Should throw an exception
+                r_value = -1;
+                g_value = -1;
+                b_value = -1;
             } else {
                 String[] arrSplit = msg.split(" ");
-
-                r_value=Double.parseDouble(arrSplit[0]);
-                g_value=Double.parseDouble(arrSplit[1]);
-                b_value=Double.parseDouble(arrSplit[2]);
+                r_value = Integer.parseInt(arrSplit[0]);
+                g_value = Integer.parseInt(arrSplit[1]);
+                b_value = Integer.parseInt(arrSplit[2]);
             }
-
             col_lock = false;
-
             // robot.sensorInterrupt("R: " + r_value + "G:" + g_value + "B:" + b_value );
 
         } else if (topic.equals(topicsSub.get(mqttTopic.COLOR_LOOK))) {
             // TODO: What we need to do in here ?
 
             // sensor/color/{id}/?
-            System.out.println("Received: " + topic + "> " + "R: " + r_value + "G:" + g_value + "B:" + b_value );
+            System.out.println("Received: " + topic + "> " + " R: " + r_value + " G:" + g_value + " B:" + b_value);
 
         } else {
-            System.out.println("Received (unknown): " + topic + "> " + "R: " + r_value + "G:" + g_value + "B:" + b_value );
+            System.out.println("Received (unknown): " + topic + "> " + " R: " + r_value + " G:" + g_value + " B:" + b_value);
         }
 
     }
 
+    // TODO: implement a RGBColor Class and use is as the return type
     public double[] getColor() throws Exception {
         // Publish to sensor/color/ -> {id: this.id}
         // Listen to sensor/color/{robotId} -> color
@@ -80,6 +80,7 @@ public class ColorSensor<array, col_value> extends AbstractSensor {
         // Prepare the message
         JSONObject msg = new JSONObject();
         msg.put("id", robotId);
+        msg.put("reality", "M"); // inform the requesting reality
         //System.out.println(msg.toJSONString());
 
         // Acquire the color sensor lock
@@ -106,7 +107,7 @@ public class ColorSensor<array, col_value> extends AbstractSensor {
             throw new SensorException("Color sensor timeout");
         }
 
-        System.out.println("R: " + r_value + "G:" + g_value + "B:" + b_value );
+        System.out.println("R: " + r_value + "G:" + g_value + "B:" + b_value);
 
         double[] color = {r_value, g_value, b_value};
         return color;

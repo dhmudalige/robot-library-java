@@ -25,7 +25,7 @@ public class Swarm extends Thread {
         Robot[] vr = new VirtualRobot[robotList.length];
 
         for (int i = 0; i < robotList.length; i++) {
-            vr[i] = new MoveRobot(robotList[i], startX + incX * i, startY + incY * i, heading);
+            vr[i] = new ColorRippleRobot(robotList[i], startX + incX * i, startY + incY * i, heading);
             new Thread(vr[i]).start();
         }
     }
