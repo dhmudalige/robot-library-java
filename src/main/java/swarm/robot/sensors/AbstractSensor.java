@@ -4,6 +4,7 @@ import swarm.Interfaces.IMqttHandler;
 import swarm.mqtt.RobotMqttClient;
 import swarm.mqtt.MqttMsg;
 import swarm.robot.Robot;
+import swarm.robot.exception.RGBColorException;
 
 public abstract class AbstractSensor implements IMqttHandler {
 
@@ -21,7 +22,7 @@ public abstract class AbstractSensor implements IMqttHandler {
         // This will subscribe to a given topic through mqttHandler
     }
 
-    public void handleSubscription(Robot r, MqttMsg m) {
+    public void handleSubscription(Robot r, MqttMsg m) throws RGBColorException {
         //  This will handle incoming messages with already subscribed topics
     }
 
