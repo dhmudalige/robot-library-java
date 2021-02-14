@@ -74,6 +74,7 @@ public class DistanceSensor extends AbstractSensor {
         // Prepare the message
         JSONObject msg = new JSONObject();
         msg.put("id", robotId);
+        msg.put("reality", "M"); // inform the requesting reality
         //System.out.println(msg.toJSONString());
 
         // Acquire the distance sensor lock

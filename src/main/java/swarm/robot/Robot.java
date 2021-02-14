@@ -18,7 +18,7 @@ public abstract class Robot implements Runnable, IRobotState {
 
     // Sensors -----------------------------------------------------------
     public DistanceSensor distSensor;
-    // ColorSensor colorSensor;
+    public ColorSensor colorSensor;
 
     // Communication -----------------------------------------------------
     public SimpleCommunication simpleComm;
@@ -62,6 +62,7 @@ public abstract class Robot implements Runnable, IRobotState {
 
         // Setup each module
         distSensor = new DistanceSensor(this, robotMqttClient);
+        colorSensor = new ColorSensor(this, robotMqttClient);
         simpleComm = new SimpleCommunication(id, robotMqttClient);
         directedComm = new DirectedCommunication(id, robotMqttClient);
         neoPixel = new NeoPixel(id, robotMqttClient);
@@ -130,6 +131,10 @@ public abstract class Robot implements Runnable, IRobotState {
                         if (m.topicGroups[1].equals("distance")) {
                             // System.out.println("distance sensor message received");
                             distSensor.handleSubscription(this, m);
+
+                        } else if (m.topicGroups[1].equals("color")) {
+                            // System.out.println("color sensor message received");
+                            colorSensor.handleSubscription(this, m);
                         }
 
                         break;
@@ -148,7 +153,7 @@ public abstract class Robot implements Runnable, IRobotState {
                         // System.out.println("communication message received");
                         if (m.topicGroups[1].equals("simple")) {
                             simpleComm.handleSubscription(this, m);
-                        }else{
+                        } else {
                             // directed
                         }
                         break;
@@ -161,6 +166,7 @@ public abstract class Robot implements Runnable, IRobotState {
             }
         }
     }
+
     private void handlePublishQueue() {
         // Publish messages which are collected in the outgoing queue
 

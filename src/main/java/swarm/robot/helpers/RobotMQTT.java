@@ -71,19 +71,19 @@ public class RobotMQTT {
                     break;
 
                 case "START":
-                    // TODO: execute pattern.start method
-                    //pattern.start();
+                    // execute pattern.start method
+                    r.start();
 
                     break;
                 case "STOP":
-                    // TODO: execute pattern.stop method
-                    //pattern.stop();
+                    // execute pattern.stop method
+                    r.stop();
 
                     break;
 
                 case "RESET":
-                    // TODO: execute pattern.reset method
-                    //pattern.reset();
+                    // execute pattern.reset method
+                    r.reset();
             }
 
         } else {

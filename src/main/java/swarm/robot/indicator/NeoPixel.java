@@ -6,7 +6,7 @@ import org.json.simple.parser.ParseException;
 import swarm.mqtt.RobotMqttClient;
 import swarm.mqtt.MqttMsg;
 import swarm.robot.Robot;
-import swarm.robot.exception.IndicatorException;
+import swarm.robot.exception.RGBColorException;
 
 import java.util.HashMap;
 
@@ -58,10 +58,15 @@ public class NeoPixel extends AbstractOutput {
         }
     }
 
-    public void changeColor(int r, int g, int b){
+    public void changeColor(int r, int g, int b) {
+
         try {
-            throw new IndicatorException(r,g,b);
-        } catch (IndicatorException e) {
+            // TODO: done this test using the RGBColorType Class
+            if (r < 0 || r > 255) throw new RGBColorException(r, g, b);
+            if (g < 0 || g > 255) throw new RGBColorException(r, g, b);
+            if (b < 0 || b > 255) throw new RGBColorException(r, g, b);
+
+        } catch (RGBColorException e) {
             e.printStackTrace();
         }
 

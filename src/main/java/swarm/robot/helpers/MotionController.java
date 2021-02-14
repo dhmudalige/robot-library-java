@@ -8,7 +8,7 @@ public class MotionController {
 
     static final private int maxInterval = 100; // This is the maximum interval allowed to coordinate calculation, smaller values increase the smoothness of the movement
 
-    // TODO: Obtain this by an experiment
+    // REM: Obtain this by an experiment
     static final private double speedFactor = 0.05; // to be match with cm/s speed
 
     private final Coordinate c;
