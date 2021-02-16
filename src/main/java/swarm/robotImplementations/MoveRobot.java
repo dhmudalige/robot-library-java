@@ -29,13 +29,18 @@ public class MoveRobot extends VirtualRobot {
             // Go back a little
             motion.move(-200, -200, 1000);
 
+            // TODO: Can this cause to infinity loop ?
             // rotate
-            while(distSensor.getDistance() < 50) {
-                motion.rotate(50 * Integer.signum(random), 1000);
-            }
+            int loopCount = 0;
 
-            // rotate furthermore
-            motion.rotate(50 * Integer.signum(random), 2000);
+            while(distSensor.getDistance() < 50 && loopCount<5) {
+                motion.rotate(50 * Integer.signum(random), 1000);
+                loopCount++;
+            }
+            // TODO: What happens if coordinates are out of the arena range ?
+
+            // rotate a little
+            motion.rotate(50 * Integer.signum(random), 500);
 
         } else {
             motion.move(200, 200, 1000);
