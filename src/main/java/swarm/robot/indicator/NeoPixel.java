@@ -7,36 +7,31 @@ import swarm.mqtt.RobotMqttClient;
 import swarm.mqtt.MqttMsg;
 import swarm.robot.Robot;
 import swarm.robot.exception.RGBColorException;
+import swarm.robot.sensors.DistanceSensor;
 import swarm.robot.types.RGBColorType;
 
 import java.util.HashMap;
 
-public class NeoPixel extends AbstractOutput {
+public class NeoPixel extends AbstractIndicator {
 
     private enum mqttTopic {NEOPIXEL_IN}
-
     private final HashMap<NeoPixel.mqttTopic, String> topicsSub = new HashMap<NeoPixel.mqttTopic, String>();
 
     private int R, G, B;
 
-    public NeoPixel(int robotId, RobotMqttClient m) {
-        super(robotId, m);
+    public NeoPixel(Robot robot, RobotMqttClient m) {
+        super(robot, m);
 
-        subscribe(NeoPixel.mqttTopic.NEOPIXEL_IN, "output/neopixel/" + robotId);
+        // subscribe(mqttTopic.NEOPIXEL_IN, "output/neopixel/" + robotId);
     }
 
-    @Override
-    protected void subscribe(String topic) {
-
-    }
-
-    protected void subscribe(NeoPixel.mqttTopic key, String topic) {
+    protected void subscribe(mqttTopic key, String topic) {
         topicsSub.put(key, topic);      // Put to the queue
         robotMqttClient.subscribe(topic);   // Subscribe through MqttHandler
     }
 
     @Override
-    public void handleSubscription(Robot r, MqttMsg m) throws ParseException, RGBColorException {
+    public void handleSubscription(Robot r, MqttMsg m) throws ParseException {
         String topic = m.topic;
         String msg = m.message;
 
@@ -51,24 +46,29 @@ public class NeoPixel extends AbstractOutput {
             G = Integer.parseInt(colors[1]);
             B = Integer.parseInt(colors[2]);
 
-            System.out.println("Received: " + topic + "> " + R + "," + G + "," + B);
             changeColor(R, G, B);
+            // System.out.println("Received: " + topic + "> " + R + "," + G + "," + B);
 
         } else {
             System.out.println("Received (unknown): " + topic + "> " + msg);
         }
     }
 
-    public void changeColor(int r, int g, int b) throws RGBColorException {
+    public void changeColor(int r, int g, int b) {
 
-        RGBColorType color = new RGBColorType(r,g,b);
+        try {
+            RGBColorType color = new RGBColorType(r, g, b);
 
-        JSONObject obj = new JSONObject();
-        obj.put("id", robotId);
-        obj.put("R", R);
-        obj.put("G", G);
-        obj.put("B", B);
+            JSONObject obj = new JSONObject();
+            obj.put("id", robotId);
+            obj.put("R", R);
+            obj.put("G", G);
+            obj.put("B", B);
 
-        robotMqttClient.publish("output/neopixel", obj.toJSONString());
+            robotMqttClient.publish("output/neopixel", obj.toJSONString());
+
+        } catch (RGBColorException e) {
+            e.printStackTrace();
+        }
     }
 }

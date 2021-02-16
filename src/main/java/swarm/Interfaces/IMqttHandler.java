@@ -7,6 +7,6 @@ import java.util.HashMap;
 
 public interface IMqttHandler {
 
-    public void handleSubscription(Robot r, MqttMsg m) throws RGBColorException;
+    public void handleSubscription(Robot r, MqttMsg m);
 
 }
