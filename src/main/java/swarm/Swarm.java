@@ -3,7 +3,7 @@ package swarm;
 import swarm.robot.Robot;
 import swarm.robot.VirtualRobot;
 import swarm.robotImplementations.ColorRippleRobot;
-import swarm.robotImplementations.MoveRobot;
+import swarm.robotImplementations.ObstacleAvoidRobot;
 
 public class Swarm extends Thread {
     public static void main(String[] args) {
@@ -25,7 +25,7 @@ public class Swarm extends Thread {
         Robot[] vr = new VirtualRobot[robotList.length];
 
         for (int i = 0; i < robotList.length; i++) {
-            vr[i] = new MoveRobot(robotList[i], startX + incX * i, startY + incY * i, heading);
+            vr[i] = new ObstacleAvoidRobot(robotList[i], startX + incX * i, startY + incY * i, heading);
             new Thread(vr[i]).start();
         }
     }
