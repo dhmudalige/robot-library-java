@@ -19,6 +19,7 @@ public abstract class Robot implements Runnable, IRobotState {
     // Sensors -----------------------------------------------------------
     public DistanceSensor distSensor;
     public ColorSensor colorSensor;
+    // TODO: Implement Proximity Sensor
 
     // Communication -----------------------------------------------------
     public SimpleCommunication simpleComm;
@@ -196,11 +197,6 @@ public abstract class Robot implements Runnable, IRobotState {
     public void reset() {
         System.out.println("pattern reset on " + id);
         state = robotState.BEGIN;
-    }
-
-    @Override
-    public void execute() {
-
     }
 
     // Utility Methods ---------------------------------------------------

@@ -3,9 +3,9 @@ package swarm.robotImplementations;
 import org.json.simple.parser.ParseException;
 import swarm.robot.VirtualRobot;
 
-public class MoveRobot extends VirtualRobot {
+public class ObstacleAvoidRobot extends VirtualRobot {
 
-    public MoveRobot(int id, double x, double y, double heading) {
+    public ObstacleAvoidRobot(int id, double x, double y, double heading) {
         super(id, x, y, heading);
     }
 
@@ -21,29 +21,28 @@ public class MoveRobot extends VirtualRobot {
         if (dist < 25) {
 
             // Generate a random number in [-1000,1000] range
-            // if positive, rotate CW, otherwise rotate CCW an angle depends on the random number
+            // if even, rotate CW, otherwise rotate CCW an angle depends on the random number
             int random = -1000 + ((int) ((Math.random() * 2000)));
+            int sign = (random % 2 == 0) ? 1 : -1;
 
             System.out.println("\t Wall detected, go back and rotating " + random);
 
             // Go back a little
-            motion.move(-200, -200, 1000);
+            motion.move(-100, -100, 900);
 
-            // TODO: Can this cause to infinity loop ?
             // rotate
-            int loopCount = 0;
-
-            while(distSensor.getDistance() < 50 && loopCount<5) {
-                motion.rotate(50 * Integer.signum(random), 1000);
+            int loopCount = 0; // to avoid infinity loop
+            while (distSensor.getDistance() < 50 && loopCount < 5) {
+                motion.rotate(50 * sign, 1000);
                 loopCount++;
             }
             // TODO: What happens if coordinates are out of the arena range ?
 
             // rotate a little
-            motion.rotate(50 * Integer.signum(random), 500);
+            motion.rotate(50 * sign, 500);
 
         } else {
-            motion.move(200, 200, 1000);
+            motion.move(100, 100, 1000);
         }
 
     }
