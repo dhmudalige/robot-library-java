@@ -19,12 +19,11 @@ public abstract class Robot implements Runnable, IRobotState {
 
     // Sensors -----------------------------------------------------------
     public DistanceSensor distSensor;
-    public ColorSensor colorSensor;
     public ProximitySensor proximitySensor;
+    public ColorSensor colorSensor;
 
     // Communication -----------------------------------------------------
     public SimpleCommunication simpleComm;
-    // TODO: Implement this as same as simpleCommunication, by changing the mqtt topics and subscription
     public DirectedCommunication directedComm;
 
     // Output ------------------------------------------------------------
@@ -64,6 +63,7 @@ public abstract class Robot implements Runnable, IRobotState {
 
         // Setup each module
         distSensor = new DistanceSensor(this, robotMqttClient);
+        proximitySensor = new ProximitySensor(this, robotMqttClient);
         colorSensor = new ColorSensor(this, robotMqttClient);
         neoPixel = new NeoPixel(this, robotMqttClient);
 
@@ -134,10 +134,12 @@ public abstract class Robot implements Runnable, IRobotState {
                         if (m.topicGroups[1].equals("distance")) {
                             // System.out.println("distance sensor message received");
                             distSensor.handleSubscription(this, m);
-
                         } else if (m.topicGroups[1].equals("color")) {
                             // System.out.println("color sensor message received");
                             colorSensor.handleSubscription(this, m);
+                        } else if (m.topicGroups[1].equals("proximity")) {
+                            // System.out.println("proximity sensor message received");
+                            proximitySensor.handleSubscription(this, m);
                         }
 
                         break;
@@ -157,7 +159,7 @@ public abstract class Robot implements Runnable, IRobotState {
                         if (m.topicGroups[1].equals("simple")) {
                             simpleComm.handleSubscription(this, m);
                         } else {
-                            // directed
+                            directedComm.handleSubscription(this, m);
                         }
                         break;
 
