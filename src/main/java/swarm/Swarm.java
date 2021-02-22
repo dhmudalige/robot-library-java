@@ -18,7 +18,6 @@ public class Swarm extends Thread {
 
         // Spiral Robot Formation
         //spiralFormation(robotList, 0, 0, 90, 40, 12, 90, 30);
-
     }
 
     private static void lineFormation(int[] robotList, int startX, int startY, int heading, int incX, int incY) {
@@ -44,7 +43,6 @@ public class Swarm extends Thread {
             vr[i] = new ColorRippleRobot(robotList[i], x, y, robotHeading);
             new Thread(vr[i]).start();
         }
-
     }
 
     private static void spiralFormation(int[] robotList, int centerX, int centerY, int headingOffset, int startRadius, int deltaRadius, int startAngle, int deltaAngle) {
@@ -62,6 +60,5 @@ public class Swarm extends Thread {
             vr[i] = new VirtualRobot(robotList[i], x, y, robotHeading);
             new Thread(vr[i]).start();
         }
-
     }
 }
