@@ -1,5 +1,4 @@
 package swarm.robot.types;
-// Implement R,G or B pure color detection @NuwanJ
 
 import swarm.robot.exception.RGBColorException;
 
@@ -9,33 +8,57 @@ public class RGBColorType {
     public RGBColorType(int R, int G, int B) throws RGBColorException {
         if (R < 0 || R > 255 || G < 0 || G > 255 || B < 0 || B > 255) {
             throw new RGBColorException(R, G, B);
-        }else{
+        } else {
             this.R = R;
             this.G = G;
             this.B = B;
         }
     }
 
-    public void setColor(int R, int G, int B) {
+    public void setColor(String str) {
+        String[] color = str.split(" ");
 
+        if (color.length != 3) {
+            try {
+                throw new RGBColorException("length != 3");
+            } catch (RGBColorException e) {
+                e.printStackTrace();
+            }
+        }
+        setColor(Integer.parseInt(color[0]), Integer.parseInt(color[1]), Integer.parseInt(color[2]));
+    }
+
+    public void setColor(int R, int G, int B) {
         if (R < 0 || R > 255 || G < 0 || G > 255 || B < 0 || B > 255) {
             try {
                 throw new RGBColorException(R, G, B);
             } catch (RGBColorException e) {
                 e.printStackTrace();
             }
-        }else{
+        } else {
             this.R = R;
             this.G = G;
             this.B = B;
         }
     }
 
-    public int[] getColor(){
+    public int getR() {
+        return this.R;
+    }
+
+    public int getB() {
+        return this.B;
+    }
+
+    public int getG() {
+        return this.G;
+    }
+
+    public int[] getColor() {
         return new int[]{this.R, this.G, this.B};
     }
 
-    public String toString(){
+    public String toString() {
         return "R:" + this.R + ", G:" + this.G + ", B:" + this.B;
     }
 }

@@ -9,13 +9,34 @@ public class VirtualRobot extends Robot {
     }
 
     @Override
+    public void loop() throws Exception {
+
+    }
+
+    @Override
     public void interrupt() {
 
     }
 
     @Override
     public void sensorInterrupt(String sensor, String value) {
-
+//        switch (sensor) {
+//            case "distance":
+//                System.out.println("Distance sensor interrupt on " + id);
+//                break;
+//
+//            case "color":
+//                System.out.println("Color sensor interrupt on " + id);
+//                break;
+//
+//            case "proximity":
+//                System.out.println("Proximity sensor interrupt on " + id);
+//                break;
+//
+//            default:
+//                // TODO: make an exception other than println
+//                System.out.println("Unknown sensor type");
+//        }
     }
 
     @Override

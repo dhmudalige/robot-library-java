@@ -19,6 +19,7 @@ public class Coordinate implements IMqttHandler {
     private final int robotId;
 
     private enum mqttTopic {ROBOT_LOCALIZATION}
+
     private final HashMap<mqttTopic, String> topicsSub = new HashMap<mqttTopic, String>();
 
     public Coordinate(int robotId, double x, double y, double heading, RobotMqttClient m) {
@@ -32,7 +33,7 @@ public class Coordinate implements IMqttHandler {
     }
 
     private void subscribe(mqttTopic key, String topic) {
-        topicsSub.put(key, topic);      // Put to the queue
+        topicsSub.put(key, topic);          // Put to the queue
         robotMqttClient.subscribe(topic);   // Subscribe through MqttHandler
     }
 
@@ -99,7 +100,6 @@ public class Coordinate implements IMqttHandler {
     }
 
     public void publishCoordinate() {
-
         JSONObject coord = new JSONObject();
         coord.put("id", robotId);
         coord.put("x", getX());
@@ -120,12 +120,7 @@ public class Coordinate implements IMqttHandler {
     }
 
     private double getNormalizedHeading(double heading) {
-        /*double h = (heading + 180) % 360;
-        if (h <= 0) h += 360;
-        h = h - 180;*/
-
-        double h = heading - ceil(heading / 360 - 0.5) * 360;
-        return h;
+        return heading - ceil(heading / 360 - 0.5) * 360;
     }
 
 }

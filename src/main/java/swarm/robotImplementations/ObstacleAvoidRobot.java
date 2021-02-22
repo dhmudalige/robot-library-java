@@ -25,18 +25,22 @@ public class ObstacleAvoidRobot extends VirtualRobot {
             int random = -1000 + ((int) ((Math.random() * 2000)));
             int sign = (random % 2 == 0) ? 1 : -1;
 
-            System.out.println("\t Wall detected, go back and rotating " + random);
+            System.out.println("\t Wall detected, go back and rotate " + ((sign > 0) ? "CW" : "CCW"));
 
             // Go back a little
             motion.move(-100, -100, 900);
 
             // rotate
             int loopCount = 0; // to avoid infinity loop
-            while (distSensor.getDistance() < 50 && loopCount < 5) {
+            while (distSensor.getDistance() < 35 && loopCount < 5) {
                 motion.rotate(50 * sign, 1000);
                 loopCount++;
             }
-            // TODO: What happens if coordinates are out of the arena range ?
+            // TODO: This is a temp update to restrict the robot into arena
+            if (coordinates.getX() >= 150) coordinates.setX(145);
+            if (coordinates.getX() <= -150) coordinates.setX(-145);
+            if (coordinates.getY() >= 150) coordinates.setY(145);
+            if (coordinates.getY() <= -150) coordinates.setY(-145);
 
             // rotate a little
             motion.rotate(50 * sign, 500);
