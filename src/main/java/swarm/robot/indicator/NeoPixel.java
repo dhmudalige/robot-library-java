@@ -7,7 +7,6 @@ import swarm.mqtt.RobotMqttClient;
 import swarm.mqtt.MqttMsg;
 import swarm.robot.Robot;
 import swarm.robot.exception.RGBColorException;
-import swarm.robot.sensors.DistanceSensor;
 import swarm.robot.types.RGBColorType;
 
 import java.util.HashMap;
