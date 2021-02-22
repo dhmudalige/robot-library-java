@@ -1,5 +1,6 @@
 package swarm.robot.communication;
 
+import org.json.simple.JSONObject;
 import swarm.mqtt.RobotMqttClient;
 import swarm.mqtt.MqttMsg;
 import swarm.robot.Robot;
@@ -8,30 +9,43 @@ import java.util.HashMap;
 
 public class DirectedCommunication extends Communication {
 
-    enum mqttTopic {COMMUNICATION_IN_DIR};
+    enum mqttTopic {COMMUNICATION_IN_DIR}
+
     private final HashMap<mqttTopic, String> topicsSub = new HashMap<mqttTopic, String>();
 
-    public DirectedCommunication(int robotId, RobotMqttClient m){
+    public DirectedCommunication(int robotId, RobotMqttClient m) {
         super(robotId, m);
-        subscribe( "comm/in/dir" + robotId);
+        subscribe(mqttTopic.COMMUNICATION_IN_DIR, "comm/in/direct/" + robotId);
     }
 
-    @Override
-    void subscribe(String topic) {
-        topicsSub.put(mqttTopic.COMMUNICATION_IN_DIR, topic);      // Put to the queue
+    private void subscribe(mqttTopic key, String topic) {
+        topicsSub.put(key, topic);          // Put to the queue
         robotMqttClient.subscribe(topic);   // Subscribe through MqttHandler
     }
 
-    @Override
-    public void handleSubscription(Robot r, MqttMsg m) {
-        // comm/in/
-        String topic = m.topic;
-        String msg = m.message;
+    public void sendMessage(String msg) {
+        JSONObject obj = new JSONObject();
+        obj.put("id", robotId);
+        obj.put("msg", msg);
+        robotMqttClient.publish("comm/out/direct", obj.toJSONString());
+    }
 
-        if (topic.equals(topicsSub.get(DirectedCommunication.mqttTopic.COMMUNICATION_IN_DIR))) {
-            // comm/in/{id}
+    public void sendMessage(String msg, int distance) {
+        JSONObject obj = new JSONObject();
+        obj.put("id", robotId);
+        obj.put("msg", msg);
+        obj.put("dist", distance);
+        robotMqttClient.publish("comm/out/direct", obj.toJSONString());
+    }
+
+    @Override
+    public void handleSubscription(Robot robot, MqttMsg m) {
+        String topic = m.topic, msg = m.message;
+
+        if (topic.equals(topicsSub.get(mqttTopic.COMMUNICATION_IN_DIR))) {
+            // comm/in/direct/{id}
             // System.out.println("Received: " + topic + "> " + msg);
-            r.communicationInterrupt(msg);
+            robot.communicationInterrupt(msg);
 
         } else {
             System.out.println("Received (unknown): " + topic + "> " + msg);

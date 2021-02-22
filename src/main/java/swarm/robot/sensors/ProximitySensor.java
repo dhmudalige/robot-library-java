@@ -8,18 +8,20 @@ import java.util.HashMap;
 import org.json.simple.JSONObject;
 import swarm.mqtt.MqttMsg;
 import swarm.robot.Robot;
+import swarm.robot.exception.ProximityException;
+import swarm.robot.exception.SensorException;
+import swarm.robot.types.ProximityReadingType;
 
 public class ProximitySensor extends AbstractSensor {
+
+    private final static int MQTT_TIMEOUT = 1000;
 
     private enum mqttTopic {PROXIMITY_IN}
 
     private HashMap<mqttTopic, String> topicsSub = new HashMap<mqttTopic, String>();
 
-    private double dist0, dist1, dist2, dist3, dist4;
-
-    private double prox_value = 0;
-
-    private final static int MQTT_TIMEOUT = 1000;
+    private boolean proximity_lock = false;
+    private ProximityReadingType proximity;
 
     public ProximitySensor(Robot robot, RobotMqttClient m) {
         super(robot, m);
@@ -40,43 +42,58 @@ public class ProximitySensor extends AbstractSensor {
         if (topic.equals(topicsSub.get(mqttTopic.PROXIMITY_IN))) {
             // sensor/proximity/{id}
             //System.out.println("Input>" + msg);
-
-            // TODO: Handle Infinity
-            if (msg.compareTo("Infinity") == 0) {
-                // -1 will be returned as a fail-proof option. Should throw an exception
-                dist0 = -1; //Double.POSITIVE_INFINITY;
-                dist1 = -1; //Double.POSITIVE_INFINITY;
-                dist2 = -1; //Double.POSITIVE_INFINITY;
-                dist3 = -1; //Double.POSITIVE_INFINITY;
-                dist4 = -1; //Double.POSITIVE_INFINITY;
-            } else {
-                String[] distance = msg.split(" ");
-                dist0 = Double.parseDouble(distance[0]);
-                dist1 = Double.parseDouble(distance[1]);
-                dist2 = Double.parseDouble(distance[2]);
-                dist3 = Double.parseDouble(distance[3]);
-                dist4 = Double.parseDouble(distance[4]);
+            try {
+                proximity = new ProximityReadingType(msg);
+            } catch (ProximityException e) {
+                e.printStackTrace();
             }
-
-            // robot.sensorInterrupt("proximity", msg);
+            proximity_lock = false;
 
         } else {
             System.out.println("Received (unknown): " + topic + "> " + msg);
         }
-
     }
 
-    public void sendProximity(double d0,double d1,double d2,double d3,double d4) {
+    public ProximityReadingType getProximity() throws Exception {
+
+        // Prepare the message
+        JSONObject msg = new JSONObject();
+        msg.put("id", robotId);
+        msg.put("reality", "M");       // inform the requesting reality
+
+        proximity_lock = true;        // Acquire the proximity sensor lock
+
+        robotMqttClient.publish("sensor/proximity", msg.toJSONString());
+        robot.delay(250);
+
+        long startTime = System.currentTimeMillis();
+        boolean timeout = false;
+
+        while (proximity_lock && !timeout) {
+            try {
+                robot.handleSubscribeQueue();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            System.out.print(".");
+            robot.delay(100);
+            timeout = (System.currentTimeMillis() - startTime > MQTT_TIMEOUT);
+        }
+
+        if (timeout) {
+            throw new SensorException("Distance sensor timeout");
+        }
+
+        System.out.println(" proximity: " + proximity.toString());
+        return proximity;
+    }
+
+    public void sendProximity() {
         // Only for test, virtual robots will not invoke this.
 
         JSONObject obj = new JSONObject();
         obj.put("id", robotId);
-        obj.put("prox0", d0);
-        obj.put("prox1", d1);
-        obj.put("prox2", d2);
-        obj.put("prox3", d3);
-        obj.put("prox4", d4);
-
+        obj.put("proximity", proximity.toString());
         robotMqttClient.publish("sensor/proximity/", obj.toJSONString());
     }
 }

@@ -6,7 +6,8 @@ import swarm.robot.exception.MotionControllerException;
 
 public class MotionController {
 
-    static final private int maxInterval = 100; // This is the maximum interval allowed to coordinate calculation, smaller values increase the smoothness of the movement
+    // This is the maximum interval allowed to coordinate calculation, smaller values increase the smoothness of the movement
+    static final private int maxInterval = 100;
 
     // REM: Obtain this by an experiment
     static final private double speedFactor = 0.05; // to be match with cm/s speed
@@ -73,7 +74,7 @@ public class MotionController {
                     cumulativeInterval -= 1000;
                 }
             }
-            c.print();
+            // c.print();
             c.publishCoordinate(); // Publish to visualizer through MQTT
 
         } else {
@@ -90,8 +91,7 @@ public class MotionController {
     }
 
     public boolean goToGoal(double targetX, double targetY, int velocity, int interval) {
-        // TODO: implement this @NuwanJ
-
+        // TODO: Not fully implemented (@NuwanJ)
         double x = c.getX();
         double y = c.getY();
         double heading = c.getHeadingRad();
@@ -140,10 +140,11 @@ public class MotionController {
     }
 
     public static void debug(String msg) {
-        debug(msg,0);
+        debug(msg, 0);
     }
+
     public static void debug(String msg, int level) {
-        if(level > 1) {
+        if (level > 1) {
             System.out.println(msg);
         }
     }
