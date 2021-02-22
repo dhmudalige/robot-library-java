@@ -2,7 +2,6 @@ package swarm.robotImplementations;
 
 import org.json.simple.JSONObject;
 import swarm.robot.VirtualRobot;
-import swarm.robot.communication.SimpleCommunication;
 
 public class DiscoverColorRobot extends VirtualRobot {
     int R,G,B;
@@ -15,6 +14,7 @@ public class DiscoverColorRobot extends VirtualRobot {
         this.R=R;
         this.G=G;
         this.B=B;
+
         /*
         broadcast the color of the obstacle we are looking for by simple communication. discover_color
 
@@ -23,8 +23,8 @@ public class DiscoverColorRobot extends VirtualRobot {
             if a robot detect an obstacle{
                     stop
                     if (obstacle.color== discover_color){
-                        broadcast the message as an interrupt
-                        change color of all
+                        broadcast the message as an interrupt and change color of all
+                        interrupt();
                         break();
                     }else
                         move
@@ -50,9 +50,7 @@ public class DiscoverColorRobot extends VirtualRobot {
         obj.put("B", B);
 
         String message = obj.toJSONString();
-        //broadcast the message that this color is discovered
-
-        neoPixel.changeColor(R,G,B);
+        //broadcast the message that this color is discovered and change color of robots
     }
 
     public void start() {
