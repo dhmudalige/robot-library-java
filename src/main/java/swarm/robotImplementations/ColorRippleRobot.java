@@ -32,28 +32,6 @@ public class ColorRippleRobot extends VirtualRobot {
     }
 
     @Override
-    public void sensorInterrupt(String sensor, String value) {
-
-        switch (sensor) {
-            case "distance":
-                System.out.println("Distance sensor interrupt on " + id);
-                break;
-
-            case "color":
-                System.out.println("Color sensor interrupt on " + id);
-                break;
-
-            case "proximity":
-                System.out.println("Proximity sensor interrupt on " + id);
-                break;
-
-            default:
-                // TODO: make an exception other than println
-                System.out.println("Unknown sensor type");
-        }
-    }
-
-    @Override
     public void communicationInterrupt(String msg) {
         System.out.println("communicationInterrupt on " + id + " with msg:" + msg);
 
@@ -64,7 +42,7 @@ public class ColorRippleRobot extends VirtualRobot {
             int hopId = Integer.parseInt(s[0]);
 
             if (colorUpdated) {
-                // a reverse message, don't forward
+                // a returning message, don't forward
                 neoPixel.changeColor(0, 0, 0);
 
             } else if (hopId > currentHopId) {
@@ -79,7 +57,7 @@ public class ColorRippleRobot extends VirtualRobot {
 
                 // Send it to the next robot
                 simpleComm.sendMessage((hopId + 1) + " " + hopR + " " + hopG + " " + hopB);
-                // neoPixel.changeColor(0, 0, 0);
+                neoPixel.changeColor(0, 0, 0);
             }
         } else {
             System.out.println("Invalid msg received");

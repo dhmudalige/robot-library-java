@@ -8,13 +8,14 @@ import swarm.robotImplementations.ObstacleAvoidRobot;
 public class Swarm extends Thread {
     public static void main(String[] args) {
 
-        int[] robotList = {6,7,8,9,10};
+        int[] robotList = {10, 11, 12, 13, 14};
+        //int[] robotList = {10};
 
         // Linear Robot Formation
-        lineFormation(robotList, -90, 75, 90, 35, 0);
+        // lineFormation(robotList, -90, 75, 90, 35, 0);
 
         // Circular Robot formation
-        //circularFormation(robotList, 0, 0, 90, 60, 0, 45);
+        circularFormation(robotList, 0, 0, 0, 60, 15, 45);
 
         // Spiral Robot Formation
         //spiralFormation(robotList, 0, 0, 90, 40, 12, 90, 30);
@@ -41,7 +42,7 @@ public class Swarm extends Thread {
             y = (int) (radius * Math.sin(a * Math.PI / 180));
             robotHeading = (int) (a + headingOffset);
 
-            vr[i] = new ColorRippleRobot(robotList[i], x, y, robotHeading);
+            vr[i] = new ObstacleAvoidRobot(robotList[i], x, y, robotHeading);
             new Thread(vr[i]).start();
         }
 

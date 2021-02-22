@@ -4,7 +4,6 @@ import org.json.simple.parser.ParseException;
 import swarm.mqtt.RobotMqttClient;
 import swarm.mqtt.MqttMsg;
 import swarm.robot.Robot;
-import swarm.robot.exception.RGBColorException;
 
 public abstract class AbstractIndicator {
     protected RobotMqttClient robotMqttClient;
@@ -22,7 +21,6 @@ public abstract class AbstractIndicator {
     }
 
     //  This will handle incoming messages with already subscribed topics
-    public abstract void handleSubscription(Robot r,MqttMsg m) throws ParseException;
-
+    public abstract void handleSubscription(Robot r, MqttMsg m) throws ParseException;
 
 }
