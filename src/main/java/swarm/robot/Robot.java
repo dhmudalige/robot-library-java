@@ -29,12 +29,11 @@ public abstract class Robot implements Runnable, IRobotState {
     // Output ------------------------------------------------------------
     public NeoPixel neoPixel;
 
-    // Helper and  Controller objects ------------------------------------
+    // Helper and Controller objects ------------------------------------
     public MotionController motion;
     public RobotMQTT robotMQTT;
     public Coordinate coordinates;
     public RobotMqttClient robotMqttClient;
-
 
     // Variables ---------------------------------------------------------
     protected int id;
@@ -55,16 +54,15 @@ public abstract class Robot implements Runnable, IRobotState {
         robotMQTT.robotCreate(coordinates.getX(), coordinates.getY(), coordinates.getHeading());
 
         delay(1000);
-
         this.motion = new MotionController(coordinates);
     }
 
     public void setup() {
-
         // Setup each module
         distSensor = new DistanceSensor(this, robotMqttClient);
         proximitySensor = new ProximitySensor(this, robotMqttClient);
         colorSensor = new ColorSensor(this, robotMqttClient);
+
         neoPixel = new NeoPixel(this, robotMqttClient);
 
         simpleComm = new SimpleCommunication(id, robotMqttClient);
@@ -72,18 +70,12 @@ public abstract class Robot implements Runnable, IRobotState {
 
     }
 
-    public void loop() throws Exception {
-
-    }
-
     // Robot getters and setters -----------------------------------------
-
     public int getId() {
         return this.id;
     }
 
     // -------------------------------------------------------------------
-
     @Override
     public void run() {
         setup();
@@ -97,7 +89,7 @@ public abstract class Robot implements Runnable, IRobotState {
             }
 
             // DO NOT REMOVE OR EDIT THIS DELAY
-            // 1000 - mqttPacketDelay
+            // TODO: implement as delay = 1000 - timeTaken(loop())
             delay(1000);
 
             try {
@@ -105,19 +97,14 @@ public abstract class Robot implements Runnable, IRobotState {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-
-            // handlePublishQueue();
         }
     }
 
-
     // MQTT related methods ----------------------------------------------
-
     public void handleSubscribeQueue() throws ParseException {
         // Handle the messages in incoming queue
 
         for (MqttMsg item : robotMqttClient.inQueue) {
-
             MqttMsg m = robotMqttClient.inQueue.poll();
 
             if (m != null) {
@@ -145,9 +132,8 @@ public abstract class Robot implements Runnable, IRobotState {
                         break;
                     case "localization":
                         // Localization messages
-                        System.out.println("localization message received");
+                        // System.out.println("localization message received");
 
-                        // TODO: localization update @NuwanJ
                         if (m.topic.equals("localization/update/?")) {
                             coordinates.handleSubscription(this, m);
                         }
@@ -167,6 +153,7 @@ public abstract class Robot implements Runnable, IRobotState {
                         if ("NeoPixel".equals(m.topicGroups[1])) {
                             neoPixel.handleSubscription(this, m);
                         }
+                        break;
                 }
             }
         }
@@ -182,8 +169,7 @@ public abstract class Robot implements Runnable, IRobotState {
         }
     }
 
-    // State Change methods, implement from IRobotState-------------------
-
+    // State Change methods, implement from IRobotState -------------------
     @Override
     public void start() {
         System.out.println("pattern start on " + id);
@@ -203,7 +189,6 @@ public abstract class Robot implements Runnable, IRobotState {
     }
 
     // Utility Methods ---------------------------------------------------
-
     public void delay(int milliseconds) {
         try {
             Thread.sleep(milliseconds);

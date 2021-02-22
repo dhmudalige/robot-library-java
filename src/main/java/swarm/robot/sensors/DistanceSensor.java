@@ -17,7 +17,7 @@ public class DistanceSensor extends AbstractSensor {
     private HashMap<mqttTopic, String> topicsSub = new HashMap<mqttTopic, String>();
 
     private boolean dist_lock = false;
-    private double dist_value = 0;
+    private int dist_value = 0;
 
     private final static int MQTT_TIMEOUT = 1000;
 
@@ -28,7 +28,7 @@ public class DistanceSensor extends AbstractSensor {
     }
 
     private void subscribe(mqttTopic key, String topic) {
-        topicsSub.put(key, topic);      // Put to the queue
+        topicsSub.put(key, topic);          // Put to the queue
         robotMqttClient.subscribe(topic);   // Subscribe through MqttHandler
     }
 
@@ -42,48 +42,35 @@ public class DistanceSensor extends AbstractSensor {
             // sensor/distance/{id}
             //System.out.println("Input>" + msg);
 
-            // TODO: Handle Infinity
             if (msg.compareTo("Infinity") == 0) {
                 // -1 will be returned as a fail-proof option. Should throw an exception
-                dist_value = -1; //Double.POSITIVE_INFINITY;
+                dist_value = -1;
             } else {
-                dist_value = Double.parseDouble(msg);
+                dist_value = Integer.parseInt(msg);
             }
-
             dist_lock = false;
 
-            // robot.sensorInterrupt("distance", msg);
-
-        } else if (topic.equals(topicsSub.get(mqttTopic.DISTANCE_LOOK))) {
-            // TODO: What we need to do in here ?
-
-            // sensor/distance/{id}/?
-            System.out.println("Received: " + topic + "> " + msg);
+//        } else if (topic.equals(topicsSub.get(mqttTopic.DISTANCE_LOOK))) {
+//            // sensor/distance/{id}/?
+//            System.out.println("Received: " + topic + "> " + msg);
 
         } else {
             System.out.println("Received (unknown): " + topic + "> " + msg);
         }
-
     }
 
     public double getDistance() throws Exception {
-        // Publish to sensor/distance/ -> {id: this.id}
-        // Listen to sensor/distance/{robotId} -> distance
-        // return the reading
-
         // Prepare the message
         JSONObject msg = new JSONObject();
         msg.put("id", robotId);
-        msg.put("reality", "M"); // inform the requesting reality
-        //System.out.println(msg.toJSONString());
+        msg.put("reality", "M");    // inform the requesting reality
 
-        // Acquire the distance sensor lock
-        dist_lock = true;
+        dist_lock = true;           // Acquire the distance sensor lock
 
         robotMqttClient.publish("sensor/distance", msg.toJSONString());
         robot.delay(250);
 
-        long stratTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
         boolean timeout = false;
 
         while (dist_lock && !timeout) {
@@ -92,16 +79,15 @@ public class DistanceSensor extends AbstractSensor {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            System.out.print(".");
+            // System.out.print(".");
             robot.delay(100);
-            timeout = (System.currentTimeMillis() - stratTime > MQTT_TIMEOUT);
+            timeout = (System.currentTimeMillis() - startTime > MQTT_TIMEOUT);
         }
 
         if (timeout) {
             throw new SensorException("Distance sensor timeout");
         }
-
-        System.out.println(" Distance: " + dist_value);
+        // System.out.println(" Distance: " + dist_value);
 
         return dist_value;
     }
