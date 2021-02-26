@@ -31,10 +31,10 @@ public class Swarm extends Thread {
         discoverColor();
     }
 
-    private static void discoverColor() {
+    private static void discoverColor() throws RGBColorException {
 
         Robot[] vr = new VirtualRobot[5];
-        RGBColorType obstacleColor = null;
+        RGBColorType obstacleColor = new RGBColorType(255,0,0);
 
         try {
             obstacleColor = new RGBColorType(255,0,0);
@@ -46,7 +46,7 @@ public class Swarm extends Thread {
         vr[1] = new DiscoverColorRobot(1, -32, 64, -20, obstacleColor);
         vr[2] = new DiscoverColorRobot(2, 49, -23, 3, obstacleColor);
         vr[3] = new DiscoverColorRobot(3, 5, 76, -70, obstacleColor);
-        vr[4] = new DiscoverColorRobot(4, -69, 54, -30, obstacleColor);
+        vr[4] = new DiscoverColorRobot(4, -45, -45, 90, obstacleColor);
 
         //robots start to move
         for (Robot robot : vr) {

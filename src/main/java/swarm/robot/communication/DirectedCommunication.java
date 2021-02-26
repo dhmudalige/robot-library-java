@@ -48,7 +48,7 @@ public class DirectedCommunication extends Communication {
             robot.communicationInterrupt(msg);
 
         } else {
-            System.out.println("Received (unknown): " + topic + "> " + msg);
+            System.out.println("Received (unknown dir): " + topic + "> " + msg);
         }
     }
 }

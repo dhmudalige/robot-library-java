@@ -7,7 +7,7 @@ public class DiscoverColorRobot extends VirtualRobot {
 
     private int currentHopId;
     private boolean colorUpdated;
-    private RGBColorType obstacleColor;
+    private final RGBColorType obstacleColor;
     private boolean searching;
 
     public DiscoverColorRobot(int id, double x, double y, double heading, RGBColorType obstacleColor) {
@@ -28,16 +28,16 @@ public class DiscoverColorRobot extends VirtualRobot {
         if (searching) {
             double dist = distSensor.getDistance();
 
-            if (dist < 25) {
-                System.out.println("\t An obstacle detected, stop and observed the color");
+            if (dist < 10) {
                 RGBColorType color = colorSensor.getColor();
+                System.out.println("\t An obstacle detected, stop");
+                System.out.println("observed:"+ color.toString() + " must be:" + obstacleColor.toString());
 
-                // TODO: Is RGBColorType has comparable option ?
-                if (obstacleColor == color) {
+                if (obstacleColor.compareTo(color)) {
                     // Color is matching
                     System.out.println("\t Matching obstacle detected");
                     String id = Integer.toString(getId());
-                    simpleComm.sendMessage("0 " + obstacleColor.toString());
+                    simpleComm.sendMessage("1 " + obstacleColor.toStringColor(), 120);
                     neoPixel.changeColor(obstacleColor.getR(), obstacleColor.getG(), 0);
                     state = robotState.WAIT;
                     searching = false;
@@ -107,10 +107,10 @@ public class DiscoverColorRobot extends VirtualRobot {
 
     @Override
     public void communicationInterrupt(String msg) {
-        System.out.println("communicationInterrupt on " + id + " with msg:" + msg);
 
         // split the message
         String[] s = msg.split(" ");
+        System.out.println("communicationInterrupt on " + id + " with msg:" + msg);
 
         if (s.length == 4) {
             int hopId = Integer.parseInt(s[0]);
@@ -126,9 +126,10 @@ public class DiscoverColorRobot extends VirtualRobot {
                 delay(2000);
 
                 // Send it to the next robot
-                simpleComm.sendMessage((hopId + 1) + " " + hopR + " " + hopG + " " + hopB);
+                simpleComm.sendMessage((hopId + 1) + " " + hopR + " " + hopG + " " + hopB, 120);
                 // neoPixel.changeColor(0, 0, 0);
                 searching = false;
+                System.out.println("Send the received message...");
             }
         } else {
             System.out.println("Invalid msg received");

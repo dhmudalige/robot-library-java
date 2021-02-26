@@ -142,7 +142,7 @@ public abstract class Robot implements Runnable, IRobotState {
                     case "comm":
                         // Communication messages
                         // System.out.println("communication message received");
-                        if (m.topicGroups[1].equals("simple")) {
+                        if (m.topicGroups[2].equals("simple")) {
                             simpleComm.handleSubscription(this, m);
                         } else {
                             directedComm.handleSubscription(this, m);
