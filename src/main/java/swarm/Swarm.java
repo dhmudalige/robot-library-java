@@ -9,27 +9,17 @@ import swarm.robotImplementations.DiscoverColorRobot;
 import swarm.robotImplementations.ObstacleAvoidRobot;
 
 public class Swarm extends Thread {
+
     public static void main(String[] args) throws RGBColorException {
 
-        int[] robotList = {10, 11, 12, 13, 14};
-        //int[] robotList = {10};
-
-        VirtualRobot r0 = new VirtualRobot(0, 52, 32, 45);
-        VirtualRobot r1 = new VirtualRobot(1, -32, 64, -20);
-        VirtualRobot r2 = new VirtualRobot(2, 49, -23, 3);
-        VirtualRobot r3 = new VirtualRobot(3, 5, 76, -70);
-        VirtualRobot r4 = new VirtualRobot(4, -69, 54, -30);
-        VirtualRobot r5 = new VirtualRobot(5, 12, 12, 27);
-        VirtualRobot r6 = new VirtualRobot(6, 42, -41, -90);
-        VirtualRobot r7 = new VirtualRobot(7, 36, 3, 76);
-        VirtualRobot r8 = new VirtualRobot(8, -76, -53, -21);
-        VirtualRobot r9 = new VirtualRobot(9, 3, 2, -45);
+        // int[] robotList = {10, 11, 12, 13, 14};
+        // int[] robotList = {10};
 
         // Linear Robot Formation
         // lineFormation(robotList, -90, 75, 90, 35, 0);
 
         // Circular Robot formation
-        circularFormation(robotList, 0, 0, 0, 60, 15, 45);
+//        circularFormation(robotList, 0, 0, 0, 60, 15, 45);
 
         // Spiral Robot Formation
         //spiralFormation(robotList, 0, 0, 90, 40, 12, 90, 30);
@@ -37,16 +27,32 @@ public class Swarm extends Thread {
         //Discover colored obstacles
         //RGBColorType obstacleColor = new RGBColorType(255,0,0);
         //discoverColor(robotList,0,0,0,60,15,obstacleColor);
+
+        discoverColor();
     }
 
-    private static void discoverColor(int[] robotList, int startX, int startY, int heading, int incX, int incY, RGBColorType obstacleColor) {
-        Robot[] vr = new VirtualRobot[robotList.length];
+    private static void discoverColor() {
+
+        Robot[] vr = new VirtualRobot[5];
+        RGBColorType obstacleColor = null;
+
+        try {
+            obstacleColor = new RGBColorType(255,0,0);
+        } catch (RGBColorException e) {
+            e.printStackTrace();
+        }
+
+        vr[0] = new DiscoverColorRobot(0, 52, 32, 45, obstacleColor);
+        vr[1] = new DiscoverColorRobot(1, -32, 64, -20, obstacleColor);
+        vr[2] = new DiscoverColorRobot(2, 49, -23, 3, obstacleColor);
+        vr[3] = new DiscoverColorRobot(3, 5, 76, -70, obstacleColor);
+        vr[4] = new DiscoverColorRobot(4, -69, 54, -30, obstacleColor);
 
         //robots start to move
-        for (int i = 0; i < robotList.length; i++) {
-            vr[i] = new DiscoverColorRobot(robotList[i], startX + incX * i, startY + incY * i, heading);
-            vr[i].discover(obstacleColor);
-            new Thread(vr[i]).start();
+        for (Robot robot : vr) {
+//            vr[i] = new DiscoverColorRobot(robotList[i], startX + incX * i, startY + incY * i, heading);
+//            vr[i].discover(obstacleColor);
+            new Thread(robot).start();
         }
     }
 

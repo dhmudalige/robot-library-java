@@ -1,13 +1,9 @@
 package swarm.robot;
 
-import swarm.robot.types.RGBColorType;
-
 public class VirtualRobot extends Robot {
 
     public VirtualRobot(int id, double x, double y, double heading) {
-
         super(id, x, y, heading, 'V');
-
     }
 
     @Override
@@ -46,8 +42,4 @@ public class VirtualRobot extends Robot {
 
     }
 
-    @Override
-    public void discover(RGBColorType obstacleColor) {
-        
-    }
 }

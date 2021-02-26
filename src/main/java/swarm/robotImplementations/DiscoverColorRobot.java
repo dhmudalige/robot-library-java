@@ -8,66 +8,74 @@ public class DiscoverColorRobot extends VirtualRobot {
     private int currentHopId;
     private boolean colorUpdated;
     private RGBColorType obstacleColor;
+    private boolean searching;
 
-    public DiscoverColorRobot(int id, double x, double y, double heading) {
+    public DiscoverColorRobot(int id, double x, double y, double heading, RGBColorType obstacleColor) {
         super(id, x, y, heading);
+        this.obstacleColor = obstacleColor;
     }
 
     public void setup() {
         super.setup();
         neoPixel.changeColor(0, 0, 0);
-    }
-
-    @Override
-    public void discover(RGBColorType obstacleColor){
-        this.obstacleColor = obstacleColor;
+        searching = true;
     }
 
     @Override
     public void loop() throws Exception {
         super.loop();
 
-        double dist = distSensor.getDistance();
-        RGBColorType color = colorSensor.getColor();
+        if (searching) {
+            double dist = distSensor.getDistance();
 
-        if (dist < 25) {
-            System.out.println("\t An obstacle detected, stop and observe the color");
+            if (dist < 25) {
+                System.out.println("\t An obstacle detected, stop and observed the color");
+                RGBColorType color = colorSensor.getColor();
 
-            if(obstacleColor == color){
-                System.out.println("\t Matching obstacle detected");
-                String id = Integer.toString(getId());
-                communicationInterrupt(id + obstacleColor.toString());
-            }else {
-                // Generate a random number in [-1000,1000] range
-                // if even, rotate CW, otherwise rotate CCW an angle depends on the random number
-                int random = -1000 + ((int) ((Math.random() * 2000)));
-                int sign = (random % 2 == 0) ? 1 : -1;
+                // TODO: Is RGBColorType has comparable option ?
+                if (obstacleColor == color) {
+                    // Color is matching
+                    System.out.println("\t Matching obstacle detected");
+                    String id = Integer.toString(getId());
+                    simpleComm.sendMessage("0 " + obstacleColor.toString());
+                    neoPixel.changeColor(obstacleColor.getR(), obstacleColor.getG(), 0);
+                    state = robotState.WAIT;
+                    searching = false;
 
-                System.out.println("\t Not the obstacle we are looking for, go back and rotate " + ((sign > 0) ? "CW" : "CCW"));
+                } else {
+                    // Generate a random number in [-1000,1000] range
+                    // if even, rotate CW, otherwise rotate CCW an angle depends on the random number
+                    int random = -1000 + ((int) ((Math.random() * 2000)));
+                    int sign = (random % 2 == 0) ? 1 : -1;
 
-                // Go back a little
-                motion.move(-100, -100, 900);
+                    System.out.println("\t Not the obstacle we are looking for, go back and rotate " + ((sign > 0) ? "CW" : "CCW"));
 
-                // rotate
-                int loopCount = 0; // to avoid infinity loop
-                while (distSensor.getDistance() < 35 && loopCount < 5) {
-                    motion.rotate(50 * sign, 1000);
-                    loopCount++;
+                    // Go back a little
+                    motion.move(-100, -100, 900);
+
+                    // rotate
+                    int loopCount = 0; // to avoid infinity loop
+                    while (distSensor.getDistance() < 35 && loopCount < 5) {
+                        motion.rotate(50 * sign, 1000);
+                        loopCount++;
+                    }
+                    // TODO: This is a temp update to restrict the robot into arena
+                    if (coordinates.getX() >= 90) coordinates.setX(85);
+                    if (coordinates.getX() <= -90) coordinates.setX(-85);
+                    if (coordinates.getY() >= 90) coordinates.setY(85);
+                    if (coordinates.getY() <= -90) coordinates.setY(-85);
+
+                    // rotate a little
+                    motion.rotate(50 * sign, 500);
+
                 }
-                // TODO: This is a temp update to restrict the robot into arena
-                if (coordinates.getX() >= 150) coordinates.setX(145);
-                if (coordinates.getX() <= -150) coordinates.setX(-145);
-                if (coordinates.getY() >= 150) coordinates.setY(145);
-                if (coordinates.getY() <= -150) coordinates.setY(-145);
-
-                // rotate a little
-                motion.rotate(50 * sign, 500);
-
+            } else {
+                motion.move(100, 100, 1000);
             }
-        } else {
-            motion.move(100, 100, 1000);
+        }else{
+            // Task is completed, waiting
+            delay(150);
         }
-
     }
 
     @Override
@@ -107,11 +115,7 @@ public class DiscoverColorRobot extends VirtualRobot {
         if (s.length == 4) {
             int hopId = Integer.parseInt(s[0]);
 
-            if (colorUpdated) {
-                // a returning message, don't forward
-                neoPixel.changeColor(0, 0, 0);
-
-            } else if (hopId > currentHopId) {
+            if (hopId > currentHopId) {
                 int hopR = Integer.parseInt(s[1]);
                 int hopG = Integer.parseInt(s[2]);
                 int hopB = Integer.parseInt(s[3]);
@@ -123,7 +127,8 @@ public class DiscoverColorRobot extends VirtualRobot {
 
                 // Send it to the next robot
                 simpleComm.sendMessage((hopId + 1) + " " + hopR + " " + hopG + " " + hopB);
-                neoPixel.changeColor(0, 0, 0);
+                // neoPixel.changeColor(0, 0, 0);
+                searching = false;
             }
         } else {
             System.out.println("Invalid msg received");
