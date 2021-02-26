@@ -35,7 +35,8 @@ public class DiscoverColorRobot extends VirtualRobot {
 
             if(obstacleColor == color){
                 System.out.println("\t Matching obstacle detected");
-                //communicationInterrupt("message");
+                String id = Integer.toString(getId());
+                communicationInterrupt(id + obstacleColor.toString());
             }else {
                 // Generate a random number in [-1000,1000] range
                 // if even, rotate CW, otherwise rotate CCW an angle depends on the random number

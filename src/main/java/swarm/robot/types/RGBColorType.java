@@ -61,4 +61,5 @@ public class RGBColorType {
     public String toString() {
         return "R:" + this.R + ", G:" + this.G + ", B:" + this.B;
     }
+
 }

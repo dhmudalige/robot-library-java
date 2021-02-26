@@ -42,8 +42,6 @@ public class Swarm extends Thread {
     private static void discoverColor(int[] robotList, int startX, int startY, int heading, int incX, int incY, RGBColorType obstacleColor) {
         Robot[] vr = new VirtualRobot[robotList.length];
 
-        //broadcast the color we are looking for
-
         //robots start to move
         for (int i = 0; i < robotList.length; i++) {
             vr[i] = new DiscoverColorRobot(robotList[i], startX + incX * i, startY + incY * i, heading);
