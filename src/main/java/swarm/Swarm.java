@@ -14,6 +14,17 @@ public class Swarm extends Thread {
         int[] robotList = {10, 11, 12, 13, 14};
         //int[] robotList = {10};
 
+        VirtualRobot r0 = new VirtualRobot(0, 52, 32, 45);
+        VirtualRobot r1 = new VirtualRobot(1, -32, 64, -20);
+        VirtualRobot r2 = new VirtualRobot(2, 49, -23, 3);
+        VirtualRobot r3 = new VirtualRobot(3, 5, 76, -70);
+        VirtualRobot r4 = new VirtualRobot(4, -69, 54, -30);
+        VirtualRobot r5 = new VirtualRobot(5, 12, 12, 27);
+        VirtualRobot r6 = new VirtualRobot(6, 42, -41, -90);
+        VirtualRobot r7 = new VirtualRobot(7, 36, 3, 76);
+        VirtualRobot r8 = new VirtualRobot(8, -76, -53, -21);
+        VirtualRobot r9 = new VirtualRobot(9, 3, 2, -45);
+
         // Linear Robot Formation
         // lineFormation(robotList, -90, 75, 90, 35, 0);
 
