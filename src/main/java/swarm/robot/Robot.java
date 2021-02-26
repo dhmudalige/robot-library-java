@@ -14,6 +14,7 @@ import swarm.robot.indicator.NeoPixel;
 import swarm.robot.sensors.ColorSensor;
 import swarm.robot.sensors.DistanceSensor;
 import swarm.robot.sensors.ProximitySensor;
+import swarm.robot.types.RGBColorType;
 
 public abstract class Robot implements Runnable, IRobotState {
 
@@ -197,4 +198,5 @@ public abstract class Robot implements Runnable, IRobotState {
         }
     }
 
+    public abstract void discover(RGBColorType obstacleColor);
 }

@@ -1,5 +1,7 @@
 package swarm.robot;
 
+import swarm.robot.types.RGBColorType;
+
 public class VirtualRobot extends Robot {
 
     public VirtualRobot(int id, double x, double y, double heading) {
@@ -42,5 +44,10 @@ public class VirtualRobot extends Robot {
     @Override
     public void communicationInterrupt(String msg) {
 
+    }
+
+    @Override
+    public void discover(RGBColorType obstacleColor) {
+        
     }
 }
