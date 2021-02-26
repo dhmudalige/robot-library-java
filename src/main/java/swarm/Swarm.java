@@ -2,11 +2,14 @@ package swarm;
 
 import swarm.robot.Robot;
 import swarm.robot.VirtualRobot;
-import swarm.robotImplementations.ColorRippleRobot;
+import swarm.robot.communication.Communication;
+import swarm.robot.exception.RGBColorException;
+import swarm.robot.types.RGBColorType;
+import swarm.robotImplementations.DiscoverColorRobot;
 import swarm.robotImplementations.ObstacleAvoidRobot;
 
 public class Swarm extends Thread {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws RGBColorException {
 
         int[] robotList = {10, 11, 12, 13, 14};
         //int[] robotList = {10};
@@ -19,6 +22,23 @@ public class Swarm extends Thread {
 
         // Spiral Robot Formation
         //spiralFormation(robotList, 0, 0, 90, 40, 12, 90, 30);
+
+        //Discover colored obstacles
+        //RGBColorType obstacleColor = new RGBColorType(255,0,0);
+        //discoverColor(robotList,0,0,0,60,15,obstacleColor);
+    }
+
+    private static void discoverColor(int[] robotList, int startX, int startY, int heading, int incX, int incY, RGBColorType obstacleColor) {
+        Robot[] vr = new VirtualRobot[robotList.length];
+
+        //broadcast the color we are looking for
+
+        //robots start to move
+        for (int i = 0; i < robotList.length; i++) {
+            vr[i] = new DiscoverColorRobot(robotList[i], startX + incX * i, startY + incY * i, heading);
+            vr[i].discover(obstacleColor);
+            new Thread(vr[i]).start();
+        }
     }
 
     private static void lineFormation(int[] robotList, int startX, int startY, int heading, int incX, int incY) {
