@@ -24,21 +24,22 @@ public class DiscoverColorRobot extends VirtualRobot {
     @Override
     public void loop() throws Exception {
         super.loop();
+//        System.out.println(state);
 
-        if (searching) {
+        if (searching && state == robotState.RUN) {
             double dist = distSensor.getDistance();
 
-            if (dist < 10) {
+            if (dist < 15) {
                 RGBColorType color = colorSensor.getColor();
                 System.out.println("\t An obstacle detected, stop");
-                System.out.println("observed:"+ color.toString() + " must be:" + obstacleColor.toString());
+                System.out.println("observed:" + color.toString() + " must be:" + obstacleColor.toString());
 
                 if (obstacleColor.compareTo(color)) {
                     // Color is matching
                     System.out.println("\t Matching obstacle detected");
                     String id = Integer.toString(getId());
-                    simpleComm.sendMessage("1 " + obstacleColor.toStringColor(), 120);
-                    neoPixel.changeColor(obstacleColor.getR(), obstacleColor.getG(), 0);
+                    simpleComm.sendMessage("1 " + obstacleColor.toStringColor(), 70);
+                    neoPixel.changeColor(obstacleColor.getR(), obstacleColor.getG(), obstacleColor.getB());
                     state = robotState.WAIT;
                     searching = false;
 
@@ -71,17 +72,18 @@ public class DiscoverColorRobot extends VirtualRobot {
                 }
             } else {
                 motion.move(100, 100, 1000);
+                delay(1000);
             }
-        }else{
+        } else {
             // Task is completed, waiting
             delay(150);
         }
     }
 
-    @Override
-    public void interrupt() {
-
-    }
+//    @Override
+//    public void interrupt() {
+//
+//    }
 
     @Override
     public void sensorInterrupt(String sensor, String value) {
@@ -136,6 +138,13 @@ public class DiscoverColorRobot extends VirtualRobot {
         }
     }
 
+    public void reset() {
+        neoPixel.changeColor(0, 0, 0);
+        colorUpdated = false;
+        currentHopId = -1;
+        searching = true;
+    }
+
     public void start() {
         super.start();
 
@@ -143,6 +152,7 @@ public class DiscoverColorRobot extends VirtualRobot {
         neoPixel.changeColor(0, 0, 0);
         colorUpdated = false;
         currentHopId = -1;
+        searching = true;
     }
 
 }

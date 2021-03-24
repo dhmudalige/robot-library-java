@@ -17,6 +17,7 @@ public class ColorRippleRobot extends VirtualRobot {
         neoPixel.changeColor(0, 0, 0);
         colorUpdated = false;
         currentHopId = -1;
+        coordinates.publishCoordinate();
     }
 
     @Override

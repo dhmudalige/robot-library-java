@@ -68,6 +68,9 @@ public abstract class Robot implements Runnable, IRobotState {
         simpleComm = new SimpleCommunication(id, robotMqttClient);
         directedComm = new DirectedCommunication(id, robotMqttClient);
 
+        coordinates.setCoordinate(coordinates.getX(), coordinates.getY(), coordinates.getHeading());
+        coordinates.publishCoordinate();
+
     }
 
     // Robot getters and setters -----------------------------------------

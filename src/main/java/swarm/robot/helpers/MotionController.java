@@ -39,6 +39,8 @@ public class MotionController {
 
             int steps = (int) Math.ceil((double) interval / maxInterval);
             int stepInterval = interval / steps;
+
+
             int cumulativeInterval = 0;
 
             debug("Move using " + steps + " steps, each has " + stepInterval + " intervals");
