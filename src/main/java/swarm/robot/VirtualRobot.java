@@ -3,9 +3,7 @@ package swarm.robot;
 public class VirtualRobot extends Robot {
 
     public VirtualRobot(int id, double x, double y, double heading) {
-
         super(id, x, y, heading, 'V');
-
     }
 
     @Override
@@ -43,4 +41,5 @@ public class VirtualRobot extends Robot {
     public void communicationInterrupt(String msg) {
 
     }
+
 }

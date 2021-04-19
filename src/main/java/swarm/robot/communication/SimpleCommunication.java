@@ -15,7 +15,7 @@ public class SimpleCommunication extends Communication {
 
     public SimpleCommunication(int robotId, RobotMqttClient m) {
         super(robotId, m);
-        subscribe(mqttTopic.COMMUNICATION_IN_SIMP, "comm/in/" + robotId);
+        subscribe(mqttTopic.COMMUNICATION_IN_SIMP, "comm/in/simple/" + robotId);
     }
 
     private void subscribe(mqttTopic key, String topic) {
@@ -48,7 +48,8 @@ public class SimpleCommunication extends Communication {
             robot.communicationInterrupt(msg);
 
         } else {
-            System.out.println("Received (unknown): " + topic + "> " + msg);
+            System.out.println(topicsSub.get(mqttTopic.COMMUNICATION_IN_SIMP));
+            System.out.println("Received (unknown simp): " + topic + "> " + msg);
         }
     }
 }

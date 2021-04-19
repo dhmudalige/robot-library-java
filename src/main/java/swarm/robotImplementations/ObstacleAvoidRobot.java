@@ -18,7 +18,7 @@ public class ObstacleAvoidRobot extends VirtualRobot {
 
         double dist = distSensor.getDistance();
 
-        if (dist < 25) {
+        if (dist < 15) {
 
             // Generate a random number in [-1000,1000] range
             // if even, rotate CW, otherwise rotate CCW an angle depends on the random number
@@ -37,10 +37,10 @@ public class ObstacleAvoidRobot extends VirtualRobot {
                 loopCount++;
             }
             // TODO: This is a temp update to restrict the robot into arena
-            if (coordinates.getX() >= 90) coordinates.setX(85);
-            if (coordinates.getX() <= -90) coordinates.setX(-85);
-            if (coordinates.getY() >= 90) coordinates.setY(85);
-            if (coordinates.getY() <= -90) coordinates.setY(-85);
+            // if (coordinates.getX() >= 90) coordinates.setX(85);
+            // if (coordinates.getX() <= -90) coordinates.setX(-85);
+            // if (coordinates.getY() >= 90) coordinates.setY(85);
+            // if (coordinates.getY() <= -90) coordinates.setY(-85);
 
             // rotate a little
             motion.rotate(50 * sign, 500);

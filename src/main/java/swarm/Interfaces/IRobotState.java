@@ -9,9 +9,7 @@ public interface IRobotState
 
     public void interrupt();
 
-    // TODO: Implement more generalized approach than this
     public void sensorInterrupt(String sensor, String value);
-
     public void communicationInterrupt(String msg);
 
     public void start();

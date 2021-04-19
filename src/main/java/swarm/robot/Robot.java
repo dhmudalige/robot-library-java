@@ -38,7 +38,7 @@ public abstract class Robot implements Runnable, IRobotState {
     // Variables ---------------------------------------------------------
     protected int id;
     protected char reality;
-    robotState state = robotState.WAIT;
+    protected robotState state = robotState.WAIT;
 
     public Robot(int id, double x, double y, double heading, char reality) {
 
@@ -67,6 +67,9 @@ public abstract class Robot implements Runnable, IRobotState {
 
         simpleComm = new SimpleCommunication(id, robotMqttClient);
         directedComm = new DirectedCommunication(id, robotMqttClient);
+
+        coordinates.setCoordinate(coordinates.getX(), coordinates.getY(), coordinates.getHeading());
+        coordinates.publishCoordinate();
 
     }
 
@@ -142,7 +145,7 @@ public abstract class Robot implements Runnable, IRobotState {
                     case "comm":
                         // Communication messages
                         // System.out.println("communication message received");
-                        if (m.topicGroups[1].equals("simple")) {
+                        if (m.topicGroups[2].equals("simple")) {
                             simpleComm.handleSubscription(this, m);
                         } else {
                             directedComm.handleSubscription(this, m);

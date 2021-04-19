@@ -18,9 +18,9 @@ public class RGBColorType {
     public void setColor(String str) {
         String[] color = str.split(" ");
 
-        if (color.length != 3) {
+        if (color.length != 4) {
             try {
-                throw new RGBColorException("length != 3");
+                throw new RGBColorException("length != 4");
             } catch (RGBColorException e) {
                 e.printStackTrace();
             }
@@ -60,5 +60,13 @@ public class RGBColorType {
 
     public String toString() {
         return "R:" + this.R + ", G:" + this.G + ", B:" + this.B;
+    }
+
+    public String toStringColor() {
+        return this.R + " " + this.G + " " + this.B;
+    }
+
+    public boolean compareTo(RGBColorType color) {
+        return (color.getR()==this.R) && (color.getG()==this.G) && (color.getB()==this.B);
     }
 }
