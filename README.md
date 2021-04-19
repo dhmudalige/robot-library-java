@@ -28,9 +28,3 @@ public class MQTTSettings {
 
 ```
 
-You can run following on your local git terminal to avoid pushing changes to the remote repository
-
-```bash
-git update-index --assume-unchanged ./src/main/java/swarm/configs/MQTTSettings
-.java
-```
