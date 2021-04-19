@@ -13,8 +13,8 @@ public class Swarm extends Thread {
 
     public static void main(String[] args) {
 
-        obstacleAvoidingExperiment();
-        colorRippleExperiment();
+        // obstacleAvoidingExperiment();
+        // colorRippleExperiment();
         discoverColorExperiment();
     }
 
@@ -31,6 +31,7 @@ public class Swarm extends Thread {
     }
 
     private static void colorRippleExperiment() {
+        // Note: 0,1,2,6 and 7 are ignored; hardware robots
         int[] robotList = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         circularFormation(robotList, 0, 0, 0, 60, 0, 36);
     }
@@ -56,7 +57,7 @@ public class Swarm extends Thread {
         vr[1] = new DiscoverColorRobot(11, -32, -12, -20, obstacleColor);
         vr[2] = new DiscoverColorRobot(12, 49, -23, 3, obstacleColor);
         vr[3] = new DiscoverColorRobot(13, 54, 65, -70, obstacleColor);
-        vr[4] = new DiscoverColorRobot(14, 0, -40, 90, obstacleColor);
+        vr[4] = new DiscoverColorRobot(14, 0, -40, 105, obstacleColor);
 
         vr[5] = new DiscoverColorRobot(0, 80, 20, 90, obstacleColor);
         vr[6] = new DiscoverColorRobot(1, 40, -80, -90, obstacleColor);
