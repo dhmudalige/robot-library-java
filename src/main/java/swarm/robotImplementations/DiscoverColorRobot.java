@@ -61,10 +61,10 @@ public class DiscoverColorRobot extends VirtualRobot {
                         loopCount++;
                     }
                     // TODO: This is a temp update to restrict the robot into arena
-                    if (coordinates.getX() >= 90) coordinates.setX(85);
-                    if (coordinates.getX() <= -90) coordinates.setX(-85);
-                    if (coordinates.getY() >= 90) coordinates.setY(85);
-                    if (coordinates.getY() <= -90) coordinates.setY(-85);
+                    // if (coordinates.getX() >= 90) coordinates.setX(85);
+                    // if (coordinates.getX() <= -90) coordinates.setX(-85);
+                    // if (coordinates.getY() >= 90) coordinates.setY(85);
+                    // if (coordinates.getY() <= -90) coordinates.setY(-85);
 
                     // rotate a little
                     motion.rotate(50 * sign, 500);
@@ -79,11 +79,6 @@ public class DiscoverColorRobot extends VirtualRobot {
             delay(150);
         }
     }
-
-//    @Override
-//    public void interrupt() {
-//
-//    }
 
     @Override
     public void sensorInterrupt(String sensor, String value) {
@@ -102,7 +97,6 @@ public class DiscoverColorRobot extends VirtualRobot {
                 break;
 
             default:
-                // TODO: make an exception other than println
                 System.out.println("Unknown sensor type");
         }
     }
@@ -129,7 +123,7 @@ public class DiscoverColorRobot extends VirtualRobot {
 
                 // Send it to the next robot
                 simpleComm.sendMessage((hopId + 1) + " " + hopR + " " + hopG + " " + hopB, 120);
-                // neoPixel.changeColor(0, 0, 0);
+
                 searching = false;
                 System.out.println("Send the received message...");
             }

@@ -2,9 +2,6 @@
 
 title __HELPERS's Class Diagram__\n
 
-  namespace swarm {
-    namespace robot {
-      namespace helpers {
         class swarm.robot.helpers.Coordinate {
             - heading : double
             - robotId : int
@@ -30,25 +27,7 @@ title __HELPERS's Class Diagram__\n
             - round2()
             - subscribe()
         }
-      }
-    }
-  }
-  
 
-  namespace swarm {
-    namespace robot {
-      namespace helpers {
-        enum mqttTopic {
-          ROBOT_LOCALIZATION
-        }
-      }
-    }
-  }
-  
-
-  namespace swarm {
-    namespace robot {
-      namespace helpers {
         class swarm.robot.helpers.MotionController {
             {static} - maxInterval : int
             {static} - speedFactor : double
@@ -66,14 +45,7 @@ title __HELPERS's Class Diagram__\n
             - PID()
             - delay()
         }
-      }
-    }
-  }
-  
 
-  namespace swarm {
-    namespace robot {
-      namespace helpers {
         class swarm.robot.helpers.RobotMQTT {
             # reality : char
             # robotId : int
@@ -83,29 +55,10 @@ title __HELPERS's Class Diagram__\n
             + robotCreate()
             - subscribe()
         }
-      }
-    }
-  }
-  
-
-  namespace swarm {
-    namespace robot {
-      namespace helpers {
-        enum mqttTopic {
-          ROBOT_MSG
-          ROBOT_MSG_BROADCAST
-        }
-      }
-    }
-  }
-  
 
   swarm.robot.helpers.Coordinate .up.|> swarm.Interfaces.IMqttHandler
   swarm.robot.helpers.Coordinate o-- swarm.mqtt.RobotMqttClient : robotMqttClient
-  swarm.robot.helpers.Coordinate +-down- swarm.robot.helpers.Coordinate.mqttTopic
-  swarm.robot.helpers.MotionController o-- swarm.robot.helpers.Coordinate : c
-  swarm.robot.helpers.RobotMQTT o-- swarm.mqtt.RobotMqttClient : robotMqttClient
-  swarm.robot.helpers.RobotMQTT +-down- swarm.robot.helpers.RobotMQTT.mqttTopic
+  swarm.robot.helpers.MotionController o-- swarm.robot.helpers.Coordinate
 
 
 right footer

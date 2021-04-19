@@ -23,7 +23,6 @@ public class ColorRippleRobot extends VirtualRobot {
     @Override
     public void loop() throws Exception {
         super.loop();
-
         // Anything specially check in continuously
     }
 
@@ -36,7 +35,6 @@ public class ColorRippleRobot extends VirtualRobot {
     public void communicationInterrupt(String msg) {
         System.out.println("communicationInterrupt on " + id + " with msg:" + msg);
 
-        // split the message
         String[] s = msg.split(" ");
 
         if (s.length == 4) {

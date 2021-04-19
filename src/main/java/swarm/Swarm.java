@@ -2,40 +2,49 @@ package swarm;
 
 import swarm.robot.Robot;
 import swarm.robot.VirtualRobot;
-import swarm.robot.communication.Communication;
 import swarm.robot.exception.RGBColorException;
 import swarm.robot.types.RGBColorType;
+
 import swarm.robotImplementations.ColorRippleRobot;
 import swarm.robotImplementations.DiscoverColorRobot;
 import swarm.robotImplementations.ObstacleAvoidRobot;
 
 public class Swarm extends Thread {
 
-    public static void main(String[] args) throws RGBColorException {
+    public static void main(String[] args) {
 
-        int[] robotList = {0, 1, 2, 3, 4, 5};
-        // int[] robotList = {10};
-
-        // Linear Robot Formation
-        //lineFormation(robotList, -70, 0, 90, 30, 0);
-
-        // Circular Robot formation
-//        circularFormation(robotList, 0, 0, 0, 60, 0, 36);
-
-        // Spiral Robot Formation
-        // spiralFormation(robotList, 0, 0, 10, 10, 15, 90, 20);
-
-        //Discover colored obstacles
-        //RGBColorType obstacleColor = new RGBColorType(255,0,0);
-        //discoverColor(robotList,0,0,0,60,15,obstacleColor);
-
-        discoverColor();
+        obstacleAvoidingExperiment();
+        colorRippleExperiment();
+        discoverColorExperiment();
     }
 
-    private static void discoverColor() throws RGBColorException {
+    private static void obstacleAvoidingExperiment() {
+
+        int[] robotList = {0, 1, 2, 3, 4};
+        Robot[] vr = new VirtualRobot[robotList.length];
+
+        for (int i = 0; i < robotList.length; i++) {
+            vr[i] = new ObstacleAvoidRobot(robotList[i], -50 + 25 * i, 0, 90);
+            new Thread(vr[i]).start();
+        }
+
+    }
+
+    private static void colorRippleExperiment() {
+        int[] robotList = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        circularFormation(robotList, 0, 0, 0, 60, 0, 36);
+    }
+
+
+    private static void discoverColorExperiment() {
 
         Robot[] vr = new VirtualRobot[10];
-        RGBColorType obstacleColor = new RGBColorType(255, 0, 0);
+        RGBColorType obstacleColor = null;
+        try {
+            obstacleColor = new RGBColorType(255, 0, 0);
+        } catch (RGBColorException e) {
+            e.printStackTrace();
+        }
 
         try {
             obstacleColor = new RGBColorType(255, 0, 0);
@@ -57,8 +66,6 @@ public class Swarm extends Thread {
 
         //robots start to move
         for (Robot robot : vr) {
-//            vr[i] = new DiscoverColorRobot(robotList[i], startX + incX * i, startY + incY * i, heading);
-//            vr[i].discover(obstacleColor);
             new Thread(robot).start();
         }
     }
@@ -84,9 +91,10 @@ public class Swarm extends Thread {
             robotHeading = (int) (a + headingOffset);
 
             if (i == 0 || i == 1 || i == 2 || i == 6 | i == 7) {
-                // phy
+                System.out.println(i + "> x:" + x + " y:" + y + " heading:" + robotHeading);
             } else {
                 vr[i] = new ColorRippleRobot(robotList[i], x, y, robotHeading);
+                // vr[i] = new ObstacleAvoidRobot(robotList[i], x, y, robotHeading);
                 new Thread(vr[i]).start();
             }
 

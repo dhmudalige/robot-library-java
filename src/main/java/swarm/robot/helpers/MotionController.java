@@ -93,7 +93,7 @@ public class MotionController {
     }
 
     public boolean goToGoal(double targetX, double targetY, int velocity, int interval) {
-        // TODO: Not fully implemented (@NuwanJ)
+        // TODO: Not fully implemented
         double x = c.getX();
         double y = c.getY();
         double heading = c.getHeadingRad();

@@ -37,10 +37,10 @@ public class ObstacleAvoidRobot extends VirtualRobot {
                 loopCount++;
             }
             // TODO: This is a temp update to restrict the robot into arena
-            if (coordinates.getX() >= 90) coordinates.setX(85);
-            if (coordinates.getX() <= -90) coordinates.setX(-85);
-            if (coordinates.getY() >= 90) coordinates.setY(85);
-            if (coordinates.getY() <= -90) coordinates.setY(-85);
+            // if (coordinates.getX() >= 90) coordinates.setX(85);
+            // if (coordinates.getX() <= -90) coordinates.setX(-85);
+            // if (coordinates.getY() >= 90) coordinates.setY(85);
+            // if (coordinates.getY() <= -90) coordinates.setY(-85);
 
             // rotate a little
             motion.rotate(50 * sign, 500);
