@@ -15,9 +15,13 @@ as follows and provide your MQTT broker's configurations.
 You can select any channel, as same as your simulation server runs on.
 
 ```
+<<<<<<< HEAD
 server=127.0.0.1
 port=1883
 username=user
 password=pass
 channel="v1"
 ```
+=======
+
+>>>>>>> 7a1ef035a5f9db7b5fcfc41e8aa37b6a7355ba01
