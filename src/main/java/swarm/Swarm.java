@@ -15,6 +15,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9a3c368026f40c11a45188175e217db2d6179ece
 
 public class Swarm extends Thread {
 
@@ -49,6 +53,10 @@ public class Swarm extends Thread {
             // I/O error
             System.out.println("IO Error !!!");
         }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9a3c368026f40c11a45188175e217db2d6179ece
     }
 
     private static void obstacleAvoidingExperiment() {
@@ -68,7 +76,10 @@ public class Swarm extends Thread {
         int[] robotList = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         circularFormation(robotList, 0, 0, 0, 60, 0, 36);
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9a3c368026f40c11a45188175e217db2d6179ece
 
     private static void discoverColorExperiment() {
 
@@ -80,12 +91,15 @@ public class Swarm extends Thread {
             e.printStackTrace();
         }
 
+<<<<<<< HEAD
         try {
             obstacleColor = new RGBColorType(255, 0, 0);
         } catch (RGBColorException e) {
             e.printStackTrace();
         }
 
+=======
+>>>>>>> 9a3c368026f40c11a45188175e217db2d6179ece
         vr[0] = new DiscoverColorRobot(10, -52, 32, 45, obstacleColor);
         vr[1] = new DiscoverColorRobot(11, -32, -12, -20, obstacleColor);
         vr[2] = new DiscoverColorRobot(12, 49, -23, 3, obstacleColor);
