@@ -28,4 +28,5 @@ hs_err_pid*
 log/
 target/
 
-/src/main/java/swarm/configs/MQTTSettings.java
+/src/resources/config/mqtt.properties
+/.settings/
