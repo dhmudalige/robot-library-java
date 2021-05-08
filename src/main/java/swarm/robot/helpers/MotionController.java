@@ -34,6 +34,22 @@ public class MotionController {
 
     // -----------------------------------
 
+    public void rotateDegree(int speed, float degree){
+        // TODO: implement this
+        // degree is relative angle displacement from the current heading
+        // prepare a mathematical equation to translate speed and  degree into
+        // the function 'public void move(int leftSpeed, int rightSpeed, int interval)'
+    }
+
+    public void moveDistance(int speed, float distance){
+        // TODO: implement & test this
+        // distance is relative displacement (in cm) from the current position
+
+        int interval =  (int) Math.ceil((double)distance/speed);
+        move(speed,speed, interval);
+    }
+
+    // -----------------------------------
     public void move(int leftSpeed, int rightSpeed, int interval) {
         if (isSpeedInRange(leftSpeed) && isSpeedInRange(rightSpeed)) {
 
@@ -120,7 +136,14 @@ public class MotionController {
 
     // validate speeds to be between [-255, 255]
     public boolean isSpeedInRange(int speed) {
-        return (-1 * RobotSettings.ROBOT_SPEED_MAX) <= speed && speed <= RobotSettings.ROBOT_SPEED_MAX;
+        if (speed > 0) {
+            return (speed >= RobotSettings.ROBOT_SPEED_MIN && speed <= RobotSettings.ROBOT_SPEED_MAX);
+        } else if (speed < 0) {
+            return (speed <= -1 * RobotSettings.ROBOT_SPEED_MIN && speed >= -1 * RobotSettings.ROBOT_SPEED_MAX);
+        }
+
+        // 0 speed is acceptable
+        return true;
     }
 
     private double PID(double e) {

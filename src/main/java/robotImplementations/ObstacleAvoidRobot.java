@@ -1,6 +1,5 @@
-package swarm.robotImplementations;
+package robotImplementations;
 
-import org.json.simple.parser.ParseException;
 import swarm.robot.VirtualRobot;
 
 public class ObstacleAvoidRobot extends VirtualRobot {

@@ -1,21 +1,66 @@
 package swarm;
 
+import swarm.configs.MQTTSettings;
 import swarm.robot.Robot;
 import swarm.robot.VirtualRobot;
 import swarm.robot.exception.RGBColorException;
 import swarm.robot.types.RGBColorType;
 
+<<<<<<< HEAD
+import robotImplementations.ColorRippleRobot;
+import robotImplementations.DiscoverColorRobot;
+import robotImplementations.ObstacleAvoidRobot;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Properties;
+=======
 import swarm.robotImplementations.ColorRippleRobot;
 import swarm.robotImplementations.DiscoverColorRobot;
 import swarm.robotImplementations.ObstacleAvoidRobot;
+>>>>>>> 7a1ef035a5f9db7b5fcfc41e8aa37b6a7355ba01
 
 public class Swarm extends Thread {
 
     public static void main(String[] args) {
 
+<<<<<<< HEAD
+        try {
+            // COMPLETE THIS BEFORE RUN
+            // Read config properties from the file, src/resources/config/mqtt.properties
+            // If it isn't there, please make one, as given sample in the 'sample_mqtt.properties' file
+
+            File configFile = new File("src/resources/config/mqtt.properties");
+            FileReader reader = new FileReader(configFile);
+            Properties props = new Properties();
+            props.load(reader);
+
+            MQTTSettings.server = props.getProperty("server");
+            MQTTSettings.port = Integer.parseInt(props.getProperty("port", "1883"));
+            MQTTSettings.userName = props.getProperty("username");
+            MQTTSettings.password = props.getProperty("password");
+            MQTTSettings.channel = props.getProperty("channel", "v1");
+            reader.close();
+
+            // obstacleAvoidingExperiment();
+            // colorRippleExperiment();
+            discoverColorExperiment();
+
+        } catch (FileNotFoundException ex) {
+            // file does not exist
+            System.out.println("File Not Found !!!");
+
+        } catch (IOException ex) {
+            // I/O error
+            System.out.println("IO Error !!!");
+        }
+=======
         // obstacleAvoidingExperiment();
         // colorRippleExperiment();
         discoverColorExperiment();
+>>>>>>> 7a1ef035a5f9db7b5fcfc41e8aa37b6a7355ba01
     }
 
     private static void obstacleAvoidingExperiment() {
@@ -35,6 +80,7 @@ public class Swarm extends Thread {
         int[] robotList = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         circularFormation(robotList, 0, 0, 0, 60, 0, 36);
     }
+<<<<<<< HEAD
 
 
     private static void discoverColorExperiment() {
@@ -47,6 +93,20 @@ public class Swarm extends Thread {
             e.printStackTrace();
         }
 
+=======
+
+
+    private static void discoverColorExperiment() {
+
+        Robot[] vr = new VirtualRobot[10];
+        RGBColorType obstacleColor = null;
+        try {
+            obstacleColor = new RGBColorType(255, 0, 0);
+        } catch (RGBColorException e) {
+            e.printStackTrace();
+        }
+
+>>>>>>> 7a1ef035a5f9db7b5fcfc41e8aa37b6a7355ba01
         try {
             obstacleColor = new RGBColorType(255, 0, 0);
         } catch (RGBColorException e) {
