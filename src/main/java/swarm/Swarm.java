@@ -37,9 +37,9 @@ public class Swarm extends Thread {
             MQTTSettings.channel = props.getProperty("channel", "v1");
             reader.close();
 
-            // obstacleAvoidingExperiment();
+            obstacleAvoidingExperiment();
             // colorRippleExperiment();
-            discoverColorExperiment();
+            // discoverColorExperiment();
 
         } catch (FileNotFoundException ex) {
             // file does not exist

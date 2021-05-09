@@ -65,8 +65,11 @@ public class DistanceSensor extends AbstractSensor {
         msg.put("id", robotId);
         msg.put("reality", "M");    // inform the requesting reality
 
-        dist_lock = true;           // Acquire the distance sensor lock
+        // Start measuring the time
+        long begin = System.currentTimeMillis();
+        // ---------------------------
 
+        dist_lock = true;           // Acquire the distance sensor lock
         robotMqttClient.publish("sensor/distance", msg.toJSONString());
         robot.delay(250);
 
@@ -88,6 +91,15 @@ public class DistanceSensor extends AbstractSensor {
             throw new SensorException("Distance sensor timeout");
         }
         // System.out.println(" Distance: " + dist_value);
+
+        // Stop measuring the time, and publish to log channel
+        long end = System.currentTimeMillis();
+
+        JSONObject logMsg = new JSONObject();
+        logMsg.put("id", robotId);
+        logMsg.put("msg", (end-begin));
+        robotMqttClient.publish("robot/log", logMsg.toJSONString());
+        // ---------------------------
 
         return dist_value;
     }
