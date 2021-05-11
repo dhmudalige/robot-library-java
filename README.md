@@ -19,5 +19,5 @@ server=127.0.0.1
 port=1883
 username=user
 password=pass
-channel="v1"
+channel=v1
 ```
