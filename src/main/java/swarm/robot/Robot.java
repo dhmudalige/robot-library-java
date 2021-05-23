@@ -107,7 +107,7 @@ public abstract class Robot implements Runnable, IRobotState {
     public void handleSubscribeQueue() throws ParseException {
         // Handle the messages in incoming queue
 
-        for (MqttMsg item : robotMqttClient.inQueue) {
+        while(!robotMqttClient.inQueue.isEmpty()){
             MqttMsg m = robotMqttClient.inQueue.poll();
 
             if (m != null) {
@@ -165,7 +165,7 @@ public abstract class Robot implements Runnable, IRobotState {
     private void handlePublishQueue() {
         // Publish messages which are collected in the outgoing queue
 
-        for (MqttMsg item : robotMqttClient.outQueue) {
+        while(!robotMqttClient.outQueue.isEmpty()){
             MqttMsg m = robotMqttClient.outQueue.poll();
             assert m != null;
             robotMqttClient.publish(m.topic, m.message, m.QoS);
