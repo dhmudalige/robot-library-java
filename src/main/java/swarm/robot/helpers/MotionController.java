@@ -106,7 +106,7 @@ public class MotionController {
      * Rotate to a given relative angle in degrees, with a given speed
      * 
      * @param speed  the value for speed, [ROBOT_SPEED_MIN, ROBOT_SPEED_MAX]
-     * @param degree the relative degree to be rotate, positive means CW, [-180,
+     * @param degree the relative degree to be rotated, positive means CW, [-180,
      *               180]
      * @throws MotionControllerException
      */
