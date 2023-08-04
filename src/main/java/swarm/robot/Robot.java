@@ -15,6 +15,11 @@ import swarm.robot.sensors.ColorSensor;
 import swarm.robot.sensors.DistanceSensor;
 import swarm.robot.sensors.ProximitySensor;
 
+/**
+ * Abstract Class implementation for Robot
+ * 
+ * @author Nuwan Jaliyagoda
+ */
 public abstract class Robot implements Runnable, IRobotState {
 
     // Sensors -----------------------------------------------------------
@@ -40,6 +45,15 @@ public abstract class Robot implements Runnable, IRobotState {
     protected char reality;
     protected robotState state = robotState.WAIT;
 
+    /**
+     * Abstract Robot class
+     * 
+     * @param id      robot Id
+     * @param x       X coordinate as double
+     * @param y       Y coordinate as double
+     * @param heading Heading direction in degrees, as double
+     * @param reality Reality of the robot, currently only support 'V'
+     */
     public Robot(int id, double x, double y, double heading, char reality) {
 
         this.id = id;
@@ -58,6 +72,9 @@ public abstract class Robot implements Runnable, IRobotState {
         this.motion = new MotionController(coordinates);
     }
 
+    /**
+     * Setup the modules, emulators and indicators
+     */
     public void setup() {
         // Setup each module
         distSensor = new DistanceSensor(this, robotMqttClient);
@@ -71,30 +88,36 @@ public abstract class Robot implements Runnable, IRobotState {
 
         coordinates.setCoordinate(coordinates.getX(), coordinates.getY(), coordinates.getHeading());
         coordinates.publishCoordinate();
-
     }
 
-    // Robot getters and setters -----------------------------------------
+    /**
+     * Get robot Id
+     * 
+     * @return robotId as integer
+     */
     public int getId() {
         return this.id;
     }
 
-    // -------------------------------------------------------------------
+    /**
+     * Robot's main event loop
+     */
     @Override
-    public void run() {
+    public final void run() {
         setup();
 
         // noinspection InfiniteLoopStatement
         while (true) {
+            long begin_time = System.currentTimeMillis();
             try {
                 loop();
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            long end_time = System.currentTimeMillis();
 
             // DO NOT REMOVE OR EDIT THIS DELAY
-            // TODO: implement as delay = 1000 - timeTaken(loop())
-            delay(1000);
+            delay((int) Math.max(0, 1000 - (end_time - begin_time)));
 
             try {
                 handleSubscribeQueue();
@@ -104,9 +127,10 @@ public abstract class Robot implements Runnable, IRobotState {
         }
     }
 
-    // MQTT related methods ----------------------------------------------
-    public void handleSubscribeQueue() throws ParseException {
-        // Handle the messages in incoming queue
+    /**
+     * Handle MQTT subscriptions
+     */
+    public final void handleSubscribeQueue() throws ParseException {
 
         while (!robotMqttClient.inQueue.isEmpty()) {
             MqttMsg m = robotMqttClient.inQueue.poll();
@@ -163,6 +187,11 @@ public abstract class Robot implements Runnable, IRobotState {
         }
     }
 
+    /**
+     * Publish the queued MQTT messages
+     * 
+     * @Deprecated
+     */
     private void handlePublishQueue() {
         // Publish messages which are collected in the outgoing queue
 
@@ -173,26 +202,38 @@ public abstract class Robot implements Runnable, IRobotState {
         }
     }
 
-    // State Change methods, implement from IRobotState -------------------
+    /**
+     * Method which handles START command
+     */
     @Override
     public void start() {
         System.out.println("Robot start on " + id);
         state = robotState.RUN;
     }
 
+    /**
+     * Method which handles STOP command
+     */
     @Override
     public void stop() {
         System.out.println("Robot stop on " + id);
         state = robotState.WAIT;
     }
 
+    /**
+     * Method which handles RESET command
+     */
     @Override
     public void reset() {
         System.out.println("Robot reset on " + id);
         state = robotState.BEGIN;
     }
 
-    // Utility Methods ---------------------------------------------------
+    /**
+     * Delay the robot functionality for a given time
+     * 
+     * @param delay, delay in milliseconds
+     */
     public void delay(int milliseconds) {
         try {
             Thread.sleep(milliseconds);
