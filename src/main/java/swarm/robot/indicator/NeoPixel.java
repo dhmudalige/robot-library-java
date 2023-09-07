@@ -74,7 +74,7 @@ public class NeoPixel extends AbstractIndicator {
     }
 
     /**
-     * Change the color of the NeoPixel Ring
+     * Change the color of the NeoPixel Ring (inform the server and GUI)
      * 
      * @param red   Red intensity, [0,255]
      * @param green Green intensity, [0,255]
@@ -89,6 +89,6 @@ public class NeoPixel extends AbstractIndicator {
         obj.put("R", color.getR());
         obj.put("G", color.getG());
         obj.put("B", color.getB());
-        robotMqttClient.publish("output/neopixel", obj.toJSONString(), true);
+        robotMqttClient.publish("output/neopixel", obj.toJSONString());
     }
 }
