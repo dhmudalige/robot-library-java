@@ -5,6 +5,7 @@ import swarm.mqtt.RobotMqttClient;
 
 import java.util.HashMap;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import swarm.mqtt.MqttMsg;
 import swarm.robot.Robot;
@@ -23,12 +24,13 @@ public class ProximitySensor extends AbstractSensor {
         PROXIMITY_IN
     }
 
-    private final static int MQTT_TIMEOUT = 1000;
+    private final static int MQTT_TIMEOUT = 2000;
 
     private HashMap<mqttTopic, String> topicsSub = new HashMap<mqttTopic, String>();
 
     private boolean proximity_lock = false;
     private ProximityReadingType proximity;
+    private int[] angles = { 0 };
 
     /**
      * ProximitySensor class
@@ -38,6 +40,19 @@ public class ProximitySensor extends AbstractSensor {
      */
     public ProximitySensor(Robot robot, RobotMqttClient m) {
         super(robot, m);
+        subscribe(mqttTopic.PROXIMITY_IN, "sensor/proximity/" + robotId);
+    }
+
+    /**
+     * ProximitySensor class
+     * 
+     * @param robot      robot object
+     * @param angles[]   proximity sensor angles as int array
+     * @param mqttClient mqttClient object
+     */
+    public ProximitySensor(Robot robot, int angles[], RobotMqttClient m) {
+        super(robot, m);
+        this.angles = angles;
         subscribe(mqttTopic.PROXIMITY_IN, "sensor/proximity/" + robotId);
     }
 
@@ -66,7 +81,7 @@ public class ProximitySensor extends AbstractSensor {
             // sensor/proximity/{id}
 
             try {
-                proximity = new ProximityReadingType(msg);
+                proximity = new ProximityReadingType(angles, msg);
             } catch (ProximityException e) {
                 e.printStackTrace();
             }
@@ -78,6 +93,15 @@ public class ProximitySensor extends AbstractSensor {
     }
 
     /**
+     * Set the proximity sensor angles
+     * 
+     * @param proximityAngles angles as an int array
+     */
+    public void setAngles(int[] proximityAngles) {
+        this.angles = proximityAngles;
+    }
+
+    /**
      * Get the emulated proximity sensor reading from the simulator
      * 
      * @return distance as double
@@ -86,13 +110,19 @@ public class ProximitySensor extends AbstractSensor {
     public ProximityReadingType getProximity() throws Exception {
 
         JSONObject msg = new JSONObject();
+        JSONArray angleArray = new JSONArray();
+
+        for (int i = 0; i < angles.length; i++)
+            angleArray.add(angles[i]);
+
         msg.put("id", robotId);
-        msg.put("reality", "M"); // inform the requesting reality
+        msg.put("angles", angleArray);
+        msg.put("reality", "V"); // inform the requesting reality
 
         proximity_lock = true; // Acquire the proximity sensor lock
 
         robotMqttClient.publish("sensor/proximity", msg.toJSONString());
-        robot.delay(250);
+        robot.delay(250 * angles.length);
 
         long startTime = System.currentTimeMillis();
         boolean timeout = false;
@@ -103,13 +133,13 @@ public class ProximitySensor extends AbstractSensor {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            System.out.print(".");
+
             robot.delay(100);
             timeout = (System.currentTimeMillis() - startTime > MQTT_TIMEOUT);
         }
 
         if (timeout) {
-            throw new SensorException("Distance sensor timeout");
+            throw new SensorException("Proximity sensor timeout");
         }
 
         return proximity;
