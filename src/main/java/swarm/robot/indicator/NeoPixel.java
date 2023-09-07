@@ -33,6 +33,8 @@ public class NeoPixel extends AbstractIndicator {
     public NeoPixel(Robot robot, RobotMqttClient mqttClient) {
         super(robot, mqttClient);
 
+        // Set the dafault color at beginning
+        changeColor(66, 66, 66);
     }
 
     /**
@@ -87,6 +89,6 @@ public class NeoPixel extends AbstractIndicator {
         obj.put("R", color.getR());
         obj.put("G", color.getG());
         obj.put("B", color.getB());
-        robotMqttClient.publish("output/neopixel", obj.toJSONString());
+        robotMqttClient.publish("output/neopixel", obj.toJSONString(), true);
     }
 }
