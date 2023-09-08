@@ -33,6 +33,8 @@ public class NeoPixel extends AbstractIndicator {
     public NeoPixel(Robot robot, RobotMqttClient mqttClient) {
         super(robot, mqttClient);
 
+        // Set the dafault color at beginning
+        changeColor(66, 66, 66);
     }
 
     /**
@@ -72,7 +74,7 @@ public class NeoPixel extends AbstractIndicator {
     }
 
     /**
-     * Change the color of the NeoPixel Ring
+     * Change the color of the NeoPixel Ring (inform the server and GUI)
      * 
      * @param red   Red intensity, [0,255]
      * @param green Green intensity, [0,255]

@@ -68,16 +68,25 @@ public class RobotMqttClient implements MqttCallback {
     }
 
     public void publish(String topic, String body) {
-        publish(topic, body, 0);
+        publish(topic, body, 0, false);
     }
 
     public void publish(String topic, String body, int qos) {
+        publish(topic, body, qos, false);
+    }
+
+    public void publish(String topic, String body, boolean retained) {
+        publish(topic, body, 0, retained);
+    }
+
+    public void publish(String topic, String body, int qos, boolean retained) {
         if (isConnected && topic.length() > 0 && body.length() > 0) {
             // Connected, non empty topic and body
 
             String t = channel + "/" + topic; // prepare topic with message channel
             MqttMessage m = new MqttMessage(body.getBytes());
             m.setQos(qos);
+            m.setRetained(retained);
 
             try {
                 this.client.publish(t, m);
