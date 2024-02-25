@@ -8,9 +8,9 @@ import swarm.robot.Robot;
  * 
  * @author TBD
  */
-public class MotionSensor extends AbstractSensor {
+public class CompassSensor extends AbstractSensor {
 
-    public MotionSensor(Robot robot, RobotMqttClient mqttClient) {
+    public CompassSensor(Robot robot, RobotMqttClient mqttClient) {
         super(robot, mqttClient);
     }
 
