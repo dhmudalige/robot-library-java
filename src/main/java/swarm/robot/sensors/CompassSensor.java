@@ -4,6 +4,7 @@ import org.json.simple.parser.ParseException;
 import swarm.mqtt.MqttMsg;
 import swarm.mqtt.RobotMqttClient;
 import swarm.robot.Robot;
+import swarm.robot.VirtualRobot;
 import swarm.robot.exception.SensorException;
 
 import java.util.HashMap;
@@ -49,7 +50,8 @@ public class CompassSensor extends AbstractSensor {
      */
     @Override
     public void handleSubscription(Robot robot, MqttMsg m) throws RuntimeException{
-        heading = Integer.parseInt(m.message);
+        heading = Integer.parseInt(m.message); // physical robot's heading directly from the MQTT subscription
+        System.out.println("<CompassSensor> Received topic: " + m.topic + " = "+ heading);
     }
 
     /**
@@ -59,6 +61,19 @@ public class CompassSensor extends AbstractSensor {
      * @throws SensorException
      */
     public double readCompass() throws Exception {
+        try {
+            if (robot instanceof VirtualRobot) {
+                heading = robot.coordinates.getHeading();
+            } else {
+                robot.handleSubscribeQueue();
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        robot.delay(100);
+        return heading;
+    }
+    /* public double readCompass() throws Exception {
         compassLock = true; // Acquire the compass sensor lock
 
         long startTime = System.currentTimeMillis();
@@ -80,5 +95,5 @@ public class CompassSensor extends AbstractSensor {
         }
 
         return heading;
-    }
+    } */
 }
