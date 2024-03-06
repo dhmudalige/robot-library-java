@@ -159,7 +159,7 @@ public abstract class Robot implements Runnable, IRobotState {
                             // System.out.println("proximity sensor message received");
                             proximitySensor.handleSubscription(this, m);
                         } else if (m.topicGroups[1].equals("compass")) {
-                            // System.out.println("compass sensor message received");
+                             System.out.println("compass sensor message received");
                             compassSensor.handleSubscription(this, m);
                         }
 
