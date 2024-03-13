@@ -1,5 +1,6 @@
 package swarm.robot.sensors;
 
+import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import swarm.mqtt.MqttMsg;
 import swarm.mqtt.RobotMqttClient;
@@ -19,11 +20,7 @@ public class CompassSensor extends AbstractSensor {
         COMPASS_OUT
     }
 
-    private final static int MQTT_TIMEOUT = 2000;
-
-    private boolean compassLock = false;
     private HashMap<CompassSensor.mqttTopic, String> topicsSub = new HashMap<>();
-//    private CompassReadingType compass;
     private double heading;
 
     public CompassSensor(Robot robot, RobotMqttClient mqttClient) {
@@ -49,9 +46,14 @@ public class CompassSensor extends AbstractSensor {
      * @param m     Subscription topic received object
      */
     @Override
-    public void handleSubscription(Robot robot, MqttMsg m) throws RuntimeException{
-        heading = Integer.parseInt(m.message); // physical robot's heading directly from the MQTT subscription
-        System.out.println("<CompassSensor> Received topic: " + m.topic + " = "+ heading);
+    public void handleSubscription(Robot robot, MqttMsg m) throws RuntimeException {
+        String topic = m.topic, msg = m.message;
+
+        if (topic.equals(topicsSub.get(mqttTopic.COMPASS_OUT))) {
+            sendCompass(readCompass());
+        } else {
+            System.out.println("Received (unknown): " + topic + "> " + msg);
+        }
     }
 
     /**
@@ -60,7 +62,7 @@ public class CompassSensor extends AbstractSensor {
      * @return heading as double
      * @throws SensorException
      */
-    public double readCompass() throws Exception {
+    public double readCompass() {
         try {
             if (robot instanceof VirtualRobot) {
                 heading = robot.coordinates.getHeading();
@@ -70,30 +72,22 @@ public class CompassSensor extends AbstractSensor {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        robot.delay(100);
+
         return heading;
     }
-    /* public double readCompass() throws Exception {
-        compassLock = true; // Acquire the compass sensor lock
 
-        long startTime = System.currentTimeMillis();
-        boolean timeout = false;
+    /**
+     * Send the compass reading to simulation server
+     * 
+     * @param compass compass reading
+     */
+    public void sendCompass(double compass) {
 
-        while (compassLock && !timeout) {
-            try {
-                robot.handleSubscribeQueue();
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+        JSONObject obj = new JSONObject();
+        obj.put("id", robotId);
+        obj.put("compass", compass);
 
-            robot.delay(100);
-            timeout = (System.currentTimeMillis() - startTime > MQTT_TIMEOUT);
-        }
+        robotMqttClient.publish("sensor/compass/", obj.toJSONString());
+    }
 
-        if (timeout) {
-            throw new SensorException("Compass sensor timeout");
-        }
-
-        return heading;
-    } */
 }
