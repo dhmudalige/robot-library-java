@@ -21,10 +21,17 @@ public class CompassSensor extends AbstractSensor {
     }
 
     private HashMap<CompassSensor.mqttTopic, String> topicsSub = new HashMap<>();
-    private double heading;
+    private double reading;
 
-    public CompassSensor(Robot robot, RobotMqttClient mqttClient) {
+    private double bearing;
+
+    private static final double TOLERANCE = 0.000001;  // Value should be closer to zero
+
+    private static final double NORTH = 0.0;  // Should measure relative to a reference
+
+    public CompassSensor(Robot robot, double initialBearing, RobotMqttClient mqttClient) {
         super(robot, mqttClient);
+        this.bearing = initialBearing;
         subscribe(CompassSensor.mqttTopic.COMPASS_OUT, "sensor/compass/" + robotId + "/?");
     }
 
@@ -65,7 +72,15 @@ public class CompassSensor extends AbstractSensor {
     public double readCompass() {
         try {
             if (robot instanceof VirtualRobot) {
-                heading = robot.coordinates.getHeading();
+
+                double robotHead = robot.coordinates.getHeading();
+                if (Math.abs(robotHead - bearing) < TOLERANCE) {  // 'robotHead' is approximately equal to 'bearing'
+                    reading = Math.abs(NORTH) + bearing;
+                } else {
+                    reading = convertToNorth(robotHead, bearing);
+                    bearing = reading;
+                }
+
             } else {
                 robot.handleSubscribeQueue();
             }
@@ -73,7 +88,7 @@ public class CompassSensor extends AbstractSensor {
             e.printStackTrace();
         }
 
-        return heading;
+        return reading;
     }
 
     /**
@@ -90,4 +105,14 @@ public class CompassSensor extends AbstractSensor {
         robotMqttClient.publish("sensor/compass/", obj.toJSONString());
     }
 
+    private double convertToNorth(double rotatedAngle, double currentOrientation) {
+        // Normalize the current orientation to ensure it's within [0, 360)
+        currentOrientation = (currentOrientation + 360) % 360;
+
+        double bearing = Math.abs(NORTH) + currentOrientation + rotatedAngle;
+
+        bearing = (bearing + 360) % 360;
+
+        return bearing;
+    }
 }
