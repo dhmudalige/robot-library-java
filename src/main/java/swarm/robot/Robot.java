@@ -82,7 +82,7 @@ public abstract class Robot implements Runnable, IRobotState {
         distSensor = new DistanceSensor(this, robotMqttClient);
         proximitySensor = new ProximitySensor(this, robotMqttClient);
         colorSensor = new ColorSensor(this, robotMqttClient);
-        compassSensor = new CompassSensor(this, coordinates.getHeading(), robotMqttClient);
+        compassSensor = new CompassSensor(this, robotMqttClient);
 
         neoPixel = new NeoPixel(this, robotMqttClient);
 
