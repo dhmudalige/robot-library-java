@@ -25,7 +25,7 @@ public class CompassSensor extends AbstractSensor {
 
 //    private static final double TOLERANCE = 0.000001;  // Value should be closer to zero
 
-    private static final double NORTH = 0.0;  // Should measure relative to a reference (here, to the horizontal)
+    private static final double NORTH = 90.0;  // Should measure relative to a reference (here, to the horizontal)
 
     public CompassSensor(Robot robot, RobotMqttClient mqttClient) {
         super(robot, mqttClient);
