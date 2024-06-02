@@ -37,6 +37,13 @@ public class App extends Thread {
             Robot robot = new MyTestRobot(10, 0, 0, 90);
             new Thread(robot).start();
 
+            // Start a random moving robots
+            Robot robot1 = new RandomMappingRobot(10, 0, 0, 90);
+            new Thread(robot1).start();
+
+            Robot robot2 = new RandomMappingRobot(10, -81, -81, 90);
+            new Thread(robot2).start();
+
             // // Start a swarm of robots
             // int[] robotList = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
