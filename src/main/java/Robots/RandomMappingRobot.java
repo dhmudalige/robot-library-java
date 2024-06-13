@@ -6,13 +6,21 @@ import swarm.utils.MappingUtils;
 import java.util.ArrayList;
 import java.util.Random;
 
+import static swarm.utils.CSVRecorder.recordExplorations;
+
 public class RandomMappingRobot extends MappingRobot {
+    public static final String ROBOT_NAME = "<Random Moving Robot>";
+    public static final String CSV_PATH = "src/resources/csv-files/Swarm-Results.csv";
+
+
     public final double GRID_SPACE = 18.000;
 
     // Robot's initial position
     double robotRow = 0;
     double robotCol = 0;
     int robotId = 0;
+
+    int loopCount = 0;
 
     public RandomMappingRobot(int id, double x, double y, double heading) {
         super(id, x, y, heading);
@@ -57,6 +65,9 @@ public class RandomMappingRobot extends MappingRobot {
 
     public void loop() throws Exception {
         super.loop();
+        loopCount++;
+
+        long startTime = System.currentTimeMillis();
 
         if (state == robotState.RUN) {
             // Get present distances from robot's left,front and right
@@ -323,6 +334,12 @@ public class RandomMappingRobot extends MappingRobot {
 
             simpleComm.sendMessage(MappingUtils.arrayToString(occupancyGrid), 200);
         }
+
+        long endTime = System.currentTimeMillis();
+
+        long timeTaken = endTime - startTime;
+
+        recordExplorations(CSV_PATH, ROBOT_NAME, endTime, loopCount, timeTaken);
     }
 
     public void communicationInterrupt(String msg) {
