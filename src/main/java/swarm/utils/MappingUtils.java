@@ -10,6 +10,20 @@ public class MappingUtils {
         }
     }
 
+    public static void printArraySimplified(int[][] array) {
+        for (int[] row : array) {
+            for (int element : row) {
+                if (element > 0) {
+                    System.out.print("  1");
+                } else {
+                    System.out.printf("%3d", element);
+                }
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
+
     public static String arrayToString(int[][] arr) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < arr.length; i++) {
@@ -75,6 +89,24 @@ public class MappingUtils {
             }
         }
         return count;
+    }
+
+    public static int[][] convertMap(int[][] arr) {
+        int rows = arr.length;
+        int cols = arr[0].length;
+
+        int[][] convertedMap = new int[rows][cols];
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (arr[i][j]>1){
+                    convertedMap[i][j]=1;
+                } else {
+                    convertedMap[i][j]=arr[i][j];
+                }
+            }
+        }
+        return convertedMap;
     }
 
 }

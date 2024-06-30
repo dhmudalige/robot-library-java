@@ -1,5 +1,3 @@
-package swarm;
-
 import swarm.configs.MQTTSettings;
 import swarm.robot.Robot;
 
@@ -22,14 +20,15 @@ public class App extends Thread {
 
     public static void main(String[] args) {
         long setupStartTime = System.currentTimeMillis();
+
         try {
             // COMPLETE THIS BEFORE RUN
             // Read config properties from the file, src/resources/config/mqtt.properties
             // If it isn't there, please make one, as given sample in the
             // 'sample_mqtt.properties' file
 
-//            File configFile = new File("src/resources/config/mqtt.properties");
-            File configFile = new File("config/mqtt.properties");
+            File configFile = new File("src/resources/config/mqtt.properties");
+//            File configFile = new File("config/mqtt.properties");
             FileReader reader = new FileReader(configFile);
             Properties props = new Properties();
             props.load(reader);
@@ -49,6 +48,7 @@ public class App extends Thread {
 
 //            addEmptyRowToCSV(CSV_PATH);
 
+
 //            // Start random moving robots
 //            addRuntimeInfo(CSV_PATH, RandomMappingRobot.ROBOT_NAME, ROBOT_COUNT, ARENA_TYPE);
 //
@@ -59,14 +59,17 @@ public class App extends Thread {
 //            new Thread(robot2).start();
 
 
-            // Start HWARobots
-            addRuntimeInfo(CSV_PATH, HWARobot.ROBOT_NAME, ROBOT_COUNT, ARENA_TYPE);
+//            // Start HWA robots
+//            addRuntimeInfo(CSV_PATH, HWARobot.ROBOT_NAME, ROBOT_COUNT, ARENA_TYPE);
+//
+//            Robot robot1 = new HWARobot(10, 81, 81, 90);
+//            new Thread(robot1).start();
+//
+//            Robot robot2 = new HWARobot(11, -81, -81, 90);
+//            new Thread(robot2).start();
 
-            Robot robot1 = new HWARobot(10, 81, 81, 90);
-            new Thread(robot1).start();
-
-            Robot robot2 = new HWARobot(11, -81, -81, 90);
-            new Thread(robot2).start();
+            // Start HLCA robots
+            addRuntimeInfo(CSV_PATH, HLCARobot.ROBOT_NAME, ROBOT_COUNT, ARENA_TYPE);
 
             Robot robot1 = new HLCARobot(9, 63, 63, 90);
             new Thread(robot1).start();
@@ -79,15 +82,6 @@ public class App extends Thread {
 //
 //            Robot robot4 = new HLCARobot(10, -81, -81, 90);
 //            new Thread(robot4).start();
-
-            long setupEndTime = System.currentTimeMillis();
-
-            // Register the shutdown hook
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                System.out.println("Process was terminated by the user");
-                System.out.println("Total Execution Time: " + (setupEndTime - setupStartTime));
-
-            }));
 
             // // Start a swarm of robots
             // int[] robotList = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
@@ -103,6 +97,14 @@ public class App extends Thread {
             // startHeading + 10 * i);
             // new Thread(vr[i]).start();
             // }
+            long setupEndTime = System.currentTimeMillis();
+
+            // Register the shutdown hook
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                System.out.println("Process was terminated by the user");
+                System.out.println("Total Execution Time: " + (setupEndTime - setupStartTime));
+
+            }));
 
         } catch (FileNotFoundException ex) {
             // file does not exist

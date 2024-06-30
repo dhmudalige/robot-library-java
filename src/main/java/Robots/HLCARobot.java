@@ -1,49 +1,38 @@
 package Robots;
 
-import swarm.robot.VirtualRobot;
+import swarm.robot.MappingRobot;
+import swarm.utils.ArenaUtils;
+import swarm.utils.MappingUtils;
+
+import static swarm.utils.CSVRecorder.recordExplorations;
 
 /*
  * HLWARobot ==> Mapping Robot based on Heuristic Least Cost Estimate
  */
 
-public class HLCARobot extends VirtualRobot {
+public class HLCARobot extends MappingRobot {
+    public static final String ROBOT_NAME = "<HLCA Robot>";
+    public static final String CSV_PATH = "src/resources/csv-files/Swarm-Results.csv";
 
     // Size of a grid cell
     private final double GRID_SPACE = 18.000;
 
-    // The default movement speed
-    private final int defaultMoveSpeed = 200;
-
-    // The default rotate speed
-    private final int defaultRotateSpeed = 200;
-
-    // Proximity Sensor options
-    // Angles for left,front and right side rotating
-    private int[] proximityAngles = { -90, 0, 90, 180 };
-
-    // Index to get left proximity angle
-    public static int PROXIMITY_LEFT = 0;
-
-    // Index to get front proximity angle
-    public static int PROXIMITY_FRONT = 1;
-
-    // Index to get right proximity angle
-    public static int PROXIMITY_RIGHT = 2;
-
-    // Index to get back proximity angle
-    public static int PROXIMITY_BACK = 3;
-
     // Robot's initial position
-    double robotRow = 0;
-    double robotCol = 0;
+    int robotRow = 0;
+    int robotCol = 0;
     int robotId = 0;
     int cellValue = 0;
     int[] cellValuesNESW = new int[4];
 
+    int loopCount = 0;
+    int matchedCells = 0;
+
+    long startTime, endTime, timeTaken;
+
     public HLCARobot(int id, double x, double y, double heading) {
         super(id, x, y, heading);
-        robotRow=(x+81)/18;
-        robotCol=(y+81)/18;
+        robotRow= (int) ((x+81)/18);
+        robotCol= (int) ((y+81)/18);
         robotId=id;
     }
 
@@ -54,114 +43,8 @@ public class HLCARobot extends VirtualRobot {
     int rightTurns=0;
     int leftTurns=0;
 
-    int rRow;
-    int rCol;
-
-    public static void printArray(int[][] array) {
-        for (int[] row : array) {
-            for (int element : row) {
-                System.out.printf("%3d", element);
-            }
-            System.out.println();
-        }
-        System.out.println();
-    }
-
-
-    public static void printArraySimplified(int[][] array) {
-        for (int[] row : array) {
-            for (int element : row) {
-                if (element > 0) {
-                    System.out.print("  1");
-                } else {
-                    System.out.printf("%3d", element);
-                }
-            }
-            System.out.println();
-        }
-        System.out.println();
-    }
-
-    public static String arrayToString(int[][] arr) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < arr.length; i++) {
-            for (int j = 0; j < arr[i].length; j++) {
-                sb.append(arr[i][j]);
-                if (j < arr[i].length - 1) {
-                    sb.append(" "); // Add space between elements in the same row
-                }
-            }
-            if (i < arr.length - 1) {
-                sb.append("\n"); // Add newline between rows
-            }
-        } 
-        return sb.toString();
-    }
-
-    public static int[][] stringToArray(String arrayAsString) {
-        String[] rows = arrayAsString.split("\n");
-        int numRows = rows.length;
-        int[][] array = new int[numRows][];
-        for (int i = 0; i < numRows; i++) {
-            String[] elements = rows[i].split(" ");
-            int numCols = elements.length;
-            array[i] = new int[numCols];
-            for (int j = 0; j < numCols; j++) {
-                array[i][j] = Integer.parseInt(elements[j]);
-            }
-        }
-        return array;
-    }
-
-    public static int[][] getMergedMap(int[][] arr1, int[][] arr2) {
-        int rows = arr1.length;
-        int cols = arr1[0].length;
-
-        int[][] mergedMap = new int[rows][cols];
-
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                if (arr1[i][j]==-1 || arr2[i][j]==-1){
-                    mergedMap[i][j]=-1;
-                } else if (arr1[i][j]==-2 || arr2[i][j]==-2){
-                    mergedMap[i][j]=-2;
-                } else {
-                    mergedMap[i][j] = Math.max(arr1[i][j], arr2[i][j]);
-                }
-            }
-        }
-        return mergedMap;
-    }    
-
-    int count_convertMap=0;
-    public static int[][] convertMap(int[][] arr) {
-        int rows = arr.length;
-        int cols = arr[0].length;
-
-        int[][] convertedMap = new int[rows][cols];
-
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                if (arr[i][j]>1){
-                    convertedMap[i][j]=1;
-                } else {
-                    convertedMap[i][j]=arr[i][j];
-                }
-            }
-        }
-        return convertedMap;
-    }    
-
-
-
-
-
-
-
-
-
-
-
+    int rRow=0;
+    int rCol=0;
 
     public void setup() {
         System.out.println("My Test Robot Started");
@@ -180,21 +63,22 @@ public class HLCARobot extends VirtualRobot {
             }
         }
 
-        rRow = numRows-1-(int)robotRow;
-        rCol = (int)robotCol;
+        rRow = numRows-1-robotRow;
+        rCol = robotCol;
 
         // Mark the starting cell as visited
         occupancyGrid[rRow][rCol] = -2;
 
-        printArray(occupancyGrid);
+        MappingUtils.printArray(occupancyGrid);
     }
-
-
 
 
 
     public void loop() throws Exception {
         super.loop();
+        loopCount++;
+
+        startTime = System.currentTimeMillis();
 
         if (state == robotState.RUN) {
             // Get present distances from robot's left,front and right
@@ -231,34 +115,27 @@ public class HLCARobot extends VirtualRobot {
                 // System.out.println(d[PROXIMITY_RIGHT]);
                 
                 // Mark free spaces
+                double proximityRangeRight = (d[PROXIMITY_RIGHT] + 6) / GRID_SPACE;
                 switch (direction) {
                     case 0: // Facing north
-                        int count=0;
-                        for (int i = 0; i < (d[PROXIMITY_RIGHT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeRight; i++) {
                             // System.out.println(i);
                             occupancyGrid[rRow][rCol+(i)] += 1;
-                            count++;
                         }
                         break;
                     case 1: // Facing east
-                        count=0;
-                        for (int i = 0; i < (d[PROXIMITY_RIGHT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeRight; i++) {
                             occupancyGrid[rRow+i][rCol] += 1;
-                            count++;
                         }
                         break;
                     case 2: // Facing south
-                        count=0;
-                        for (int i = 0; i < (d[PROXIMITY_RIGHT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeRight; i++) {
                             occupancyGrid[rRow][rCol-(i)] += 1;
-                            count++;
                         }
                         break;
                     case 3: // Facing west
-                        count=0;
-                        for (int i = 0; i < (d[PROXIMITY_RIGHT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeRight; i++) {
                             occupancyGrid[rRow-i][rCol] += 1;
-                            count++;
                         }
                         break;
                 } 
@@ -272,7 +149,7 @@ public class HLCARobot extends VirtualRobot {
                         }
                         break;
                     case 1: // Facing east
-                        if ((int)robotRow != 0 && occupancyGrid[rRow+1][rCol] == 0){
+                        if (robotRow != 0 && occupancyGrid[rRow+1][rCol] == 0){
                             occupancyGrid[rRow+1][rCol] = -1;
                         }
                         break;
@@ -282,45 +159,39 @@ public class HLCARobot extends VirtualRobot {
                         }
                         break;
                     case 3: // Facing west
-                        if ((int)robotRow != numRows-1 && occupancyGrid[rRow-1][rCol] == 0){
+                        if (robotRow != numRows-1 && occupancyGrid[rRow-1][rCol] == 0){
                             occupancyGrid[rRow-1][rCol] = -1;
                         }
                         break;
                 } 
             }
+
 
             
             if (d[PROXIMITY_FRONT] + 6 > GRID_SPACE) {
 
                 // Mark free spaces
+                double proximityRangeFront = (d[PROXIMITY_FRONT] + 6) / GRID_SPACE;
                 switch (direction) {
                     case 0: // Facing north
-                        int count=0;
-                        for (int i = 0; i < (d[PROXIMITY_FRONT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeFront; i++) {
                             occupancyGrid[rRow-i][rCol] += 1;
-                            count++;
                         }
                         break;
                     case 1: // Facing east
-                        count=0;
-                        for (int i = 0; i < (d[PROXIMITY_FRONT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeFront; i++) {
                             occupancyGrid[rRow][rCol+i] += 1;
-                            count++;
-                        }                        
+                        }
                         break;
                     case 2: // Facing south
-                        count=0;
-                        for (int i = 0; i < (d[PROXIMITY_FRONT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeFront; i++) {
                             occupancyGrid[rRow+i][rCol] += 1;
-                            count++;
-                        }       
+                        }
                         break;
                     case 3: // Facing west
-                        count=0;
-                        for (int i = 0; i < (d[PROXIMITY_FRONT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeFront; i++) {
                             occupancyGrid[rRow][rCol-i] += 1;
-                            count++;
-                        }       
+                        }
                         break;
                 } 
             } 
@@ -328,7 +199,7 @@ public class HLCARobot extends VirtualRobot {
                 // Mark obstacles
                 switch (direction) {
                     case 0: // Facing north
-                        if ((int)robotRow != numRows-1 && occupancyGrid[rRow-1][rCol] == 0){
+                        if (robotRow != numRows-1 && occupancyGrid[rRow-1][rCol] == 0){
                             occupancyGrid[rRow-1][rCol] = -1;
                         }
                         break;
@@ -338,7 +209,7 @@ public class HLCARobot extends VirtualRobot {
                         }
                         break;
                     case 2: // Facing south
-                        if ((int)robotRow != 0 && occupancyGrid[rRow+1][rCol] == 0){
+                        if (robotRow != 0 && occupancyGrid[rRow+1][rCol] == 0){
                             occupancyGrid[rRow+1][rCol] = -1;
                         }
                         break;
@@ -351,40 +222,30 @@ public class HLCARobot extends VirtualRobot {
             }
 
 
-
-
-
             if (d[PROXIMITY_LEFT] + 6 > GRID_SPACE) {
 
                 // Mark free spaces
+                double proximityRangeLeft = (d[PROXIMITY_LEFT] + 6) / GRID_SPACE;
                 switch (direction) {
                     case 0: // Facing north
-                        int count=0;
-                        for (int i = 0; i < (d[PROXIMITY_LEFT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeLeft; i++) {
                             occupancyGrid[rRow][rCol-i] += 1;
-                            count++;
-                        }       
+                        }
                         break;
                     case 1: // Facing east
-                        count=0;
-                        for (int i = 0; i < (d[PROXIMITY_LEFT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeLeft; i++) {
                             occupancyGrid[rRow-i][rCol] += 1;
-                            count++;
-                        }       
+                        }
                         break;
                     case 2: // Facing south
-                        count=0;
-                        for (int i = 0; i < (d[PROXIMITY_LEFT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeLeft; i++) {
                             occupancyGrid[rRow][rCol+i] += 1;
-                            count++;
-                        }       
+                        }
                         break;
                     case 3: // Facing west
-                        count=0;
-                        for (int i = 0; i < (d[PROXIMITY_LEFT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeLeft; i++) {
                             occupancyGrid[rRow+i][rCol] += 1;
-                            count++;
-                        }       
+                        }
                         break;
                 } 
             } 
@@ -397,7 +258,7 @@ public class HLCARobot extends VirtualRobot {
                         }
                         break;
                     case 1: // Facing east
-                        if ((int)robotRow != numRows-1 && occupancyGrid[rRow-1][rCol] == 0){
+                        if (robotRow != numRows-1 && occupancyGrid[rRow-1][rCol] == 0){
                             occupancyGrid[rRow-1][rCol] = -1;
                         }
                         break;
@@ -407,51 +268,38 @@ public class HLCARobot extends VirtualRobot {
                         }
                         break;
                     case 3: // Facing west
-                        if ((int)robotRow != 0 && occupancyGrid[rRow+1][rCol] == 0){
+                        if (robotRow != 0 && occupancyGrid[rRow+1][rCol] == 0){
                             occupancyGrid[rRow+1][rCol] = -1;
                         }
                         break;
                 } 
-            }            
-
-
-
-
-
-
+            }
 
             
             if (d[PROXIMITY_BACK] + 6 > GRID_SPACE) {
 
                 // Mark free spaces
+                double proximityRangeBack = (d[PROXIMITY_BACK] + 6) / GRID_SPACE;
                 switch (direction) {
                     case 0: // Facing north
-                        int count=0;
-                        for (int i = 0; i < (d[PROXIMITY_BACK] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeBack; i++) {
                             occupancyGrid[rRow+i][rCol] += 1;
-                            count++;
                         }
                         break;
                     case 1: // Facing east
-                        count=0;
-                        for (int i = 0; i < (d[PROXIMITY_BACK] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeBack; i++) {
                             occupancyGrid[rRow][rCol-i] += 1;
-                            count++;
-                        }                        
+                        }
                         break;
                     case 2: // Facing south
-                        count=0;
-                        for (int i = 0; i < (d[PROXIMITY_BACK] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeBack; i++) {
                             occupancyGrid[rRow-i][rCol] += 1;
-                            count++;
-                        }       
+                        }
                         break;
                     case 3: // Facing west
-                        count=0;
-                        for (int i = 0; i < (d[PROXIMITY_BACK] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeBack; i++) {
                             occupancyGrid[rRow][rCol+i] += 1;
-                            count++;
-                        }       
+                        }
                         break;
                 } 
             } 
@@ -459,7 +307,7 @@ public class HLCARobot extends VirtualRobot {
                 // Mark obstacles
                 switch (direction) {
                     case 0: // Facing north
-                        if ((int)robotRow != numRows-1 && occupancyGrid[rRow-1][rCol] == 0){
+                        if (robotRow != numRows-1 && occupancyGrid[rRow-1][rCol] == 0){
                             occupancyGrid[rRow+1][rCol] = -1;
                         }
                         break;
@@ -469,7 +317,7 @@ public class HLCARobot extends VirtualRobot {
                         }
                         break;
                     case 2: // Facing south
-                        if ((int)robotRow != 0 && occupancyGrid[rRow+1][rCol] == 0){
+                        if (robotRow != 0 && occupancyGrid[rRow+1][rCol] == 0){
                             occupancyGrid[rRow-1][rCol] = -1;
                         }
                         break;
@@ -483,12 +331,6 @@ public class HLCARobot extends VirtualRobot {
 
             // printArray(occupancyGrid);
             // end: mark explored cells and obstacles ----------------------------------------------------------------------
-
-
-
-
-
-
 
 
             // start: get the min cellValue (finding the cell the robot should move in the next step)----------------------------------------------------------------------
@@ -533,11 +375,6 @@ public class HLCARobot extends VirtualRobot {
 
 
 
-
-
-
-
-
             // Move based on the calculated direction
             switch (direction) {
                 case 0: // Facing north
@@ -546,17 +383,17 @@ public class HLCARobot extends VirtualRobot {
                             robotRow++;
                             break;
                         case 1: // east
-                            motion.rotateDegree(defaultRotateSpeed, 90);
+                            motion.rotateDegree(ROTATING_SPEED, 90);
                             rightTurns++;
                             robotCol++;
                             break;
                         case 2: // south
-                            motion.rotateDegree(defaultRotateSpeed, 180);
+                            motion.rotateDegree(ROTATING_SPEED, 180);
                             rightTurns++;rightTurns++;
                             robotRow--;
                             break;
                         case 3: // west
-                            motion.rotateDegree(defaultRotateSpeed, -90);
+                            motion.rotateDegree(ROTATING_SPEED, -90);
                             leftTurns++;
                             robotCol--;
                             break;
@@ -565,7 +402,7 @@ public class HLCARobot extends VirtualRobot {
                 case 1: // Facing east
                     switch (minCellValueIndex) {
                         case 0: // north
-                            motion.rotateDegree(defaultRotateSpeed, -90);
+                            motion.rotateDegree(ROTATING_SPEED, -90);
                             leftTurns++;
                             robotRow++;
                             break;
@@ -573,12 +410,12 @@ public class HLCARobot extends VirtualRobot {
                             robotCol++;
                             break;
                         case 2: // south
-                            motion.rotateDegree(defaultRotateSpeed, 90);
+                            motion.rotateDegree(ROTATING_SPEED, 90);
                             rightTurns++;
                             robotRow--;
                             break;
                         case 3: // west
-                            motion.rotateDegree(defaultRotateSpeed, 180);
+                            motion.rotateDegree(ROTATING_SPEED, 180);
                             rightTurns++;rightTurns++;
                             robotCol--;
                             break;
@@ -587,12 +424,12 @@ public class HLCARobot extends VirtualRobot {
                 case 2: // Facing south
                     switch (minCellValueIndex) {
                         case 0: // north
-                            motion.rotateDegree(defaultRotateSpeed, 180);
+                            motion.rotateDegree(ROTATING_SPEED, 180);
                             rightTurns++;rightTurns++;
                             robotRow++;
                             break;
                         case 1: // east
-                            motion.rotateDegree(defaultRotateSpeed, -90);
+                            motion.rotateDegree(ROTATING_SPEED, -90);
                             leftTurns++;
                             robotCol++;
                             break;
@@ -600,7 +437,7 @@ public class HLCARobot extends VirtualRobot {
                             robotRow--;
                             break;
                         case 3: // west
-                            motion.rotateDegree(defaultRotateSpeed, 90);
+                            motion.rotateDegree(ROTATING_SPEED, 90);
                             rightTurns++;
                             robotCol--;
                             break;
@@ -609,17 +446,17 @@ public class HLCARobot extends VirtualRobot {
                 case 3: // Facing west
                     switch (minCellValueIndex) {
                         case 0: // north
-                            motion.rotateDegree(defaultRotateSpeed, 90);
+                            motion.rotateDegree(ROTATING_SPEED, 90);
                             rightTurns++;
                             robotRow++;
                             break;
                         case 1: // east
-                            motion.rotateDegree(defaultRotateSpeed, 180);
+                            motion.rotateDegree(ROTATING_SPEED, 180);
                             rightTurns++;rightTurns++;
                             robotCol++;
                             break;
                         case 2: // south
-                            motion.rotateDegree(defaultRotateSpeed, -90);
+                            motion.rotateDegree(ROTATING_SPEED, -90);
                             leftTurns++;
                             robotRow--;
                             break;
@@ -630,19 +467,16 @@ public class HLCARobot extends VirtualRobot {
                     break;
             } 
 
-
             // Robot move
-            motion.moveDistance(defaultMoveSpeed, GRID_SPACE);
+            motion.moveDistance(MOVING_SPEED, GRID_SPACE);
             delay(1000);
 
-
-            rRow = numRows-1-(int)robotRow;
-            rCol = (int)robotCol;
+            rRow = numRows-1-robotRow;
+            rCol = robotCol;
 
             cellValue = occupancyGrid[rRow][rCol];
             occupancyGrid[rRow][rCol] = -2;
-            
-   
+
             // printArray(occupancyGrid);
             // printArraySimplified(occupancyGrid);
 
@@ -653,20 +487,30 @@ public class HLCARobot extends VirtualRobot {
             //     count_convertMap=0;
             // }
 
-            simpleComm.sendMessage(arrayToString(occupancyGrid), 200);
+            simpleComm.sendMessage(MappingUtils.arrayToString(occupancyGrid), 200);
         }
+
+        endTime = System.currentTimeMillis();
+
+        timeTaken = endTime - startTime;
+
+        MappingUtils.convertThreesToOnes(occupancyGrid);
+
+        matchedCells = MappingUtils.countMatchedCells(occupancyGrid, ArenaUtils.ARENA_OBSTACLE);
+
+        recordExplorations(CSV_PATH, ROBOT_NAME, this.robotId, endTime, loopCount, timeTaken, matchedCells);
     }
 
     public void communicationInterrupt(String msg) {
         // System.out.println("Robot ID: " + robotId + " communicationInterrupt on " + id + " with msg:\n" + msg);
         // System.out.println();
 
-        int[][] array = stringToArray(msg);
+        int[][] array = MappingUtils.stringToArray(msg);
         // printArray(array);
 
-        occupancyGrid = getMergedMap(occupancyGrid, array);
+        occupancyGrid = MappingUtils.getMergedMap(occupancyGrid, array);
 
-        printArray(occupancyGrid);
+        MappingUtils.printArray(occupancyGrid);
         // printArraySimplified(occupancyGrid);
         System.out.println();
     }
