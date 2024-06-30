@@ -16,16 +16,16 @@ public class RandomMappingRobot extends MappingRobot {
     public final double GRID_SPACE = 18.000;
 
     // Robot's initial position
-    double robotRow = 0;
-    double robotCol = 0;
+    int robotRow = 0;
+    int robotCol = 0;
     int robotId = 0;
 
     int loopCount = 0;
 
     public RandomMappingRobot(int id, double x, double y, double heading) {
         super(id, x, y, heading);
-        robotRow = (x + 81) / 18;
-        robotCol = (y + 81) / 18;
+        robotRow = (int) ((x + 81) / 18);
+        robotCol = (int) ((y + 81) / 18);
         robotId = id;
     }
 
@@ -55,7 +55,7 @@ public class RandomMappingRobot extends MappingRobot {
         }
 
         // Mark the starting cell as visited
-        occupancyGrid[numRows - 1 - (int) robotRow][(int) robotCol] = 3;
+        occupancyGrid[numRows - 1 - robotRow][robotCol] = 3;
 
         // Print the array
         // System.out.println("Robot ID: " + robotId);
@@ -90,34 +90,27 @@ public class RandomMappingRobot extends MappingRobot {
                 // System.out.println(d[PROXIMITY_RIGHT]);
 
                 // Mark free spaces
+                double proximityRangeRight = (d[PROXIMITY_RIGHT] + 6) / GRID_SPACE;
                 switch (direction) {
                     case 0: // Facing north
-                        int count = 0;
-                        for (int i = 0; i < (d[PROXIMITY_RIGHT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeRight; i++) {
                             // System.out.println(i);
-                            occupancyGrid[numRows - 1 - (int) robotRow][(int) robotCol + (i)] = 1;
-                            count++;
+                            occupancyGrid[numRows - 1 - robotRow][robotCol + (i)] = 1;
                         }
                         break;
                     case 1: // Facing east
-                        count = 0;
-                        for (int i = 0; i < (d[PROXIMITY_RIGHT] + 6) / GRID_SPACE; i++) {
-                            occupancyGrid[numRows - 1 - ((int) robotRow - (i))][(int) robotCol] = 1;
-                            count++;
+                        for (int i = 0; i < proximityRangeRight; i++) {
+                            occupancyGrid[numRows - 1 - (robotRow - (i))][robotCol] = 1;
                         }
                         break;
                     case 2: // Facing south
-                        count = 0;
-                        for (int i = 0; i < (d[PROXIMITY_RIGHT] + 6) / GRID_SPACE; i++) {
-                            occupancyGrid[numRows - 1 - (int) robotRow][(int) robotCol - (i)] = 1;
-                            count++;
+                        for (int i = 0; i < proximityRangeRight; i++) {
+                            occupancyGrid[numRows - 1 - robotRow][robotCol - (i)] = 1;
                         }
                         break;
                     case 3: // Facing west
-                        count = 0;
-                        for (int i = 0; i < (d[PROXIMITY_RIGHT] + 6) / GRID_SPACE; i++) {
-                            occupancyGrid[numRows - 1 - ((int) robotRow + (i))][(int) robotCol] = 1;
-                            count++;
+                        for (int i = 0; i < proximityRangeRight; i++) {
+                            occupancyGrid[numRows - 1 - (robotRow + (i))][robotCol] = 1;
                         }
                         break;
                 }
@@ -125,23 +118,23 @@ public class RandomMappingRobot extends MappingRobot {
                 // Mark obstacles
                 switch (direction) {
                     case 0: // Facing north
-                        if ((int) robotCol != numCols - 1 && occupancyGrid[numRows - 1 - (int) robotRow][(int) robotCol + 1] == 0) {
-                            occupancyGrid[numRows - 1 - (int) robotRow][(int) robotCol + 1] = 2;
+                        if (robotCol != numCols - 1 && occupancyGrid[numRows - 1 - robotRow][robotCol + 1] == 0) {
+                            occupancyGrid[numRows - 1 - robotRow][robotCol + 1] = 2;
                         }
                         break;
                     case 1: // Facing east
-                        if ((int) robotRow != 0 && occupancyGrid[numRows - 1 - ((int) robotRow - 1)][(int) robotCol] == 0) {
-                            occupancyGrid[numRows - 1 - ((int) robotRow - 1)][(int) robotCol] = 2;
+                        if (robotRow != 0 && occupancyGrid[numRows - 1 - (robotRow - 1)][robotCol] == 0) {
+                            occupancyGrid[numRows - 1 - (robotRow - 1)][robotCol] = 2;
                         }
                         break;
                     case 2: // Facing south
-                        if ((int) robotCol != 0 && occupancyGrid[numRows - 1 - (int) robotRow][(int) robotCol - 1] == 0) {
-                            occupancyGrid[numRows - 1 - (int) robotRow][(int) robotCol - 1] = 2;
+                        if (robotCol != 0 && occupancyGrid[numRows - 1 - robotRow][robotCol - 1] == 0) {
+                            occupancyGrid[numRows - 1 - robotRow][robotCol - 1] = 2;
                         }
                         break;
                     case 3: // Facing west
-                        if ((int) robotRow != numRows - 1 && occupancyGrid[numRows - 1 - ((int) robotRow + 1)][(int) robotCol] == 0) {
-                            occupancyGrid[numRows - 1 - ((int) robotRow + 1)][(int) robotCol] = 2;
+                        if (robotRow != numRows - 1 && occupancyGrid[numRows - 1 - (robotRow + 1)][robotCol] == 0) {
+                            occupancyGrid[numRows - 1 - (robotRow + 1)][robotCol] = 2;
                         }
                         break;
                 }
@@ -151,33 +144,26 @@ public class RandomMappingRobot extends MappingRobot {
                 intList.add(2);
 
                 // Mark free spaces
+                double proximityRangeFront = (d[PROXIMITY_FRONT] + 6) / GRID_SPACE;
                 switch (direction) {
                     case 0: // Facing north
-                        int count = 0;
-                        for (int i = 0; i < (d[PROXIMITY_FRONT] + 6) / GRID_SPACE; i++) {
-                            occupancyGrid[numRows - 1 - ((int) robotRow + i)][(int) robotCol] = 1;
-                            count++;
+                        for (int i = 0; i < proximityRangeFront; i++) {
+                            occupancyGrid[numRows - 1 - (robotRow + i)][robotCol] = 1;
                         }
                         break;
                     case 1: // Facing east
-                        count = 0;
-                        for (int i = 0; i < (d[PROXIMITY_FRONT] + 6) / GRID_SPACE; i++) {
-                            occupancyGrid[numRows - 1 - (int) robotRow][(int) robotCol + i] = 1;
-                            count++;
+                        for (int i = 0; i < proximityRangeFront; i++) {
+                            occupancyGrid[numRows - 1 - robotRow][robotCol + i] = 1;
                         }
                         break;
                     case 2: // Facing south
-                        count = 0;
-                        for (int i = 0; i < (d[PROXIMITY_FRONT] + 6) / GRID_SPACE; i++) {
-                            occupancyGrid[numRows - 1 - ((int) robotRow - i)][(int) robotCol] = 1;
-                            count++;
+                        for (int i = 0; i < proximityRangeFront; i++) {
+                            occupancyGrid[numRows - 1 - (robotRow - i)][robotCol] = 1;
                         }
                         break;
                     case 3: // Facing west
-                        count = 0;
-                        for (int i = 0; i < (d[PROXIMITY_FRONT] + 6) / GRID_SPACE; i++) {
-                            occupancyGrid[numRows - 1 - (int) robotRow][(int) robotCol - i] = 1;
-                            count++;
+                        for (int i = 0; i < proximityRangeFront; i++) {
+                            occupancyGrid[numRows - 1 - robotRow][robotCol - i] = 1;
                         }
                         break;
                 }
@@ -185,23 +171,23 @@ public class RandomMappingRobot extends MappingRobot {
                 // Mark obstacles
                 switch (direction) {
                     case 0: // Facing north
-                        if ((int) robotRow != numRows - 1 && occupancyGrid[numRows - 1 - ((int) robotRow + 1)][(int) robotCol] == 0) {
-                            occupancyGrid[numRows - 1 - ((int) robotRow + 1)][(int) robotCol] = 2;
+                        if (robotRow != numRows - 1 && occupancyGrid[numRows - 1 - (robotRow + 1)][robotCol] == 0) {
+                            occupancyGrid[numRows - 1 - (robotRow + 1)][robotCol] = 2;
                         }
                         break;
                     case 1: // Facing east
-                        if ((int) robotCol != numCols - 1 && occupancyGrid[numRows - 1 - (int) robotRow][(int) robotCol + 1] == 0) {
-                            occupancyGrid[numRows - 1 - (int) robotRow][(int) robotCol + 1] = 2;
+                        if (robotCol != numCols - 1 && occupancyGrid[numRows - 1 - robotRow][robotCol + 1] == 0) {
+                            occupancyGrid[numRows - 1 - robotRow][robotCol + 1] = 2;
                         }
                         break;
                     case 2: // Facing south
-                        if ((int) robotRow != 0 && occupancyGrid[numRows - 1 - ((int) robotRow - 1)][(int) robotCol] == 0) {
-                            occupancyGrid[numRows - 1 - ((int) robotRow - 1)][(int) robotCol] = 2;
+                        if (robotRow != 0 && occupancyGrid[numRows - 1 - (robotRow - 1)][robotCol] == 0) {
+                            occupancyGrid[numRows - 1 - (robotRow - 1)][robotCol] = 2;
                         }
                         break;
                     case 3: // Facing west
-                        if ((int) robotCol != 0 && occupancyGrid[numRows - 1 - (int) robotRow][(int) robotCol - 1] == 0) {
-                            occupancyGrid[numRows - 1 - (int) robotRow][(int) robotCol - 1] = 2;
+                        if (robotCol != 0 && occupancyGrid[numRows - 1 - robotRow][robotCol - 1] == 0) {
+                            occupancyGrid[numRows - 1 - robotRow][robotCol - 1] = 2;
                         }
                         break;
                 }
@@ -211,33 +197,26 @@ public class RandomMappingRobot extends MappingRobot {
                 intList.add(3);
 
                 // Mark free spaces
+                double proximityRangeLeft = (d[PROXIMITY_LEFT] + 6) / GRID_SPACE;
                 switch (direction) {
                     case 0: // Facing north
-                        int count = 0;
-                        for (int i = 0; i < (d[PROXIMITY_LEFT] + 6) / GRID_SPACE; i++) {
-                            occupancyGrid[numRows - 1 - (int) robotRow][(int) robotCol - i] = 1;
-                            count++;
+                        for (int i = 0; i < proximityRangeLeft; i++) {
+                            occupancyGrid[numRows - 1 - robotRow][robotCol - i] = 1;
                         }
                         break;
                     case 1: // Facing east
-                        count = 0;
-                        for (int i = 0; i < (d[PROXIMITY_LEFT] + 6) / GRID_SPACE; i++) {
-                            occupancyGrid[numRows - 1 - ((int) robotRow + i)][(int) robotCol] = 1;
-                            count++;
+                        for (int i = 0; i < proximityRangeLeft; i++) {
+                            occupancyGrid[numRows - 1 - (robotRow + i)][robotCol] = 1;
                         }
                         break;
                     case 2: // Facing south
-                        count = 0;
-                        for (int i = 0; i < (d[PROXIMITY_LEFT] + 6) / GRID_SPACE; i++) {
-                            occupancyGrid[numRows - 1 - (int) robotRow][(int) robotCol + i] = 1;
-                            count++;
+                        for (int i = 0; i < proximityRangeLeft; i++) {
+                            occupancyGrid[numRows - 1 - robotRow][robotCol + i] = 1;
                         }
                         break;
                     case 3: // Facing west
-                        count = 0;
-                        for (int i = 0; i < (d[PROXIMITY_LEFT] + 6) / GRID_SPACE; i++) {
-                            occupancyGrid[numRows - 1 - ((int) robotRow - i)][(int) robotCol] = 1;
-                            count++;
+                        for (int i = 0; i < proximityRangeLeft; i++) {
+                            occupancyGrid[numRows - 1 - (robotRow - i)][robotCol] = 1;
                         }
                         break;
                 }
@@ -245,23 +224,23 @@ public class RandomMappingRobot extends MappingRobot {
                 // Mark obstacles
                 switch (direction) {
                     case 0: // Facing north
-                        if ((int) robotCol != 0 && occupancyGrid[numRows - 1 - (int) robotRow][(int) robotCol - 1] == 0) {
-                            occupancyGrid[numRows - 1 - (int) robotRow][(int) robotCol - 1] = 2;
+                        if (robotCol != 0 && occupancyGrid[numRows - 1 - robotRow][robotCol - 1] == 0) {
+                            occupancyGrid[numRows - 1 - robotRow][robotCol - 1] = 2;
                         }
                         break;
                     case 1: // Facing east
-                        if ((int) robotRow != numRows - 1 && occupancyGrid[numRows - 1 - ((int) robotRow + 1)][(int) robotCol] == 0) {
-                            occupancyGrid[numRows - 1 - ((int) robotRow + 1)][(int) robotCol] = 2;
+                        if (robotRow != numRows - 1 && occupancyGrid[numRows - 1 - (robotRow + 1)][robotCol] == 0) {
+                            occupancyGrid[numRows - 1 - (robotRow + 1)][robotCol] = 2;
                         }
                         break;
                     case 2: // Facing south
-                        if ((int) robotCol != numCols - 1 && occupancyGrid[numRows - 1 - (int) robotRow][(int) robotCol + 1] == 0) {
-                            occupancyGrid[numRows - 1 - (int) robotRow][(int) robotCol + 1] = 2;
+                        if (robotCol != numCols - 1 && occupancyGrid[numRows - 1 - robotRow][robotCol + 1] == 0) {
+                            occupancyGrid[numRows - 1 - robotRow][robotCol + 1] = 2;
                         }
                         break;
                     case 3: // Facing west
-                        if ((int) robotRow != 0 && occupancyGrid[numRows - 1 - ((int) robotRow - 1)][(int) robotCol] == 0) {
-                            occupancyGrid[numRows - 1 - ((int) robotRow - 1)][(int) robotCol] = 2;
+                        if (robotRow != 0 && occupancyGrid[numRows - 1 - (robotRow - 1)][robotCol] == 0) {
+                            occupancyGrid[numRows - 1 - (robotRow - 1)][robotCol] = 2;
                         }
                         break;
                 }
@@ -325,7 +304,7 @@ public class RandomMappingRobot extends MappingRobot {
                 }
             }
 
-            occupancyGrid[numRows - 1 - (int) robotRow][(int) robotCol] = 3;
+            occupancyGrid[numRows - 1 - robotRow][robotCol] = 3;
 
             // Print the array
             // System.out.println("Robot ID: " + robotId);
