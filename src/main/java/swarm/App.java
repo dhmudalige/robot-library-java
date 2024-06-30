@@ -11,7 +11,14 @@ import java.util.Properties;
 
 import Robots.*;
 
+import static swarm.utils.CSVRecorder.addRuntimeInfo;
+import static swarm.utils.SwarmUtils.getDate;
+
 public class App extends Thread {
+    public static final String CSV_PATH = "src/resources/csv-files/Swarm-Results.csv";
+
+    public static final int ROBOT_COUNT = 2;
+    public static final String ARENA_TYPE = "arena_obstacles";
 
     public static void main(String[] args) {
 
@@ -42,6 +49,23 @@ public class App extends Thread {
             new Thread(robot1).start();
 
             Robot robot2 = new HWARobot(11, -81, -81, 90);
+            new Thread(robot2).start();
+            System.out.println("<PeraSwarm> Starting at " + getDate() + "...");
+//            addEmptyRowToCSV(CSV_PATH);
+
+//            // Start a single robot
+//            Robot robot = new MyTestRobot(10, 0, 0, 90);
+//            new Thread(robot).start();
+
+            // Start a random moving robots
+            ////////////////////////////////////////////////////////
+            addRuntimeInfo(CSV_PATH, RandomMappingRobot.ROBOT_NAME, ROBOT_COUNT, ARENA_TYPE);
+            ////////////////////////////////////////////////////////
+
+            Robot robot1 = new RandomMappingRobot(10, 81, 81, 90);
+            new Thread(robot1).start();
+
+            Robot robot2 = new RandomMappingRobot(11, -81, -81, 90);
             new Thread(robot2).start();
 
             // // Start a swarm of robots
