@@ -1,34 +1,19 @@
 package Robots;
 
-import swarm.robot.VirtualRobot;
+import swarm.robot.MappingRobot;
+
+import swarm.utils.MappingUtils;
 
 /*
 * HWARobot ==> Mapping Robot based on Heuristic Wavefront Algorithm
  */
 
-public class HWARobot extends VirtualRobot {
+public class HWARobot extends MappingRobot {
+    public static final String ROBOT_NAME = "<Random Moving Robot>";
+    public static final String CSV_PATH = "src/resources/csv-files/Swarm-Results.csv";
 
     // Size of a grid cell
     private final double GRID_SPACE = 18.000;
-
-    // The default movement speed
-    private final int defaultMoveSpeed = 200;
-
-    // The default rotate speed
-    private final int defaultRotateSpeed = 200;
-
-    // Proximity Sensor options
-    // Angles for left,front and right side rotating
-    private int[] proximityAngles = { -90, 0, 90 };
-
-    // Index to get left proximity angle
-    public static int PROXIMITY_LEFT = 0;
-
-    // Index to get front proximity angle
-    public static int PROXIMITY_FRONT = 1;
-
-    // Index to get right proximity angle
-    public static int PROXIMITY_RIGHT = 2;
 
     // Robot's initial position
     double robotRow = 0;
@@ -53,77 +38,6 @@ public class HWARobot extends VirtualRobot {
     int rRow;
     int rCol;
 
-    public static void printArray(int[][] array) {
-        for (int[] row : array) {
-            for (int element : row) {
-                System.out.printf("%3d", element);
-            }
-            System.out.println();
-        }
-        System.out.println();
-    }
-
-
-    public static void printArraySimplified(int[][] array) {
-        for (int[] row : array) {
-            for (int element : row) {
-                if (element > 0) {
-                    System.out.print("  1");
-                } else {
-                    System.out.printf("%3d", element);
-                }
-            }
-            System.out.println();
-        }
-        System.out.println();
-    }
-
-    public static String arrayToString(int[][] arr) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < arr.length; i++) {
-            for (int j = 0; j < arr[i].length; j++) {
-                sb.append(arr[i][j]);
-                if (j < arr[i].length - 1) {
-                    sb.append(" "); // Add space between elements in the same row
-                }
-            }
-            if (i < arr.length - 1) {
-                sb.append("\n"); // Add newline between rows
-            }
-        } 
-        return sb.toString();
-    }
-
-    public static int[][] stringToArray(String arrayAsString) {
-        String[] rows = arrayAsString.split("\n");
-        int numRows = rows.length;
-        int[][] array = new int[numRows][];
-        for (int i = 0; i < numRows; i++) {
-            String[] elements = rows[i].split(" ");
-            int numCols = elements.length;
-            array[i] = new int[numCols];
-            for (int j = 0; j < numCols; j++) {
-                array[i][j] = Integer.parseInt(elements[j]);
-            }
-        }
-        return array;
-    }
-
-    public static int[][] getMergedMap(int[][] arr1, int[][] arr2) {
-        int rows = arr1.length;
-        int cols = arr1[0].length;
-
-        int[][] mergedMap = new int[rows][cols];
-
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                mergedMap[i][j] = Math.max(arr1[i][j], arr2[i][j]);
-            }
-        }
-        return mergedMap;
-    }    
-
-    
     public static int[] getCoordinatesForIteration(int[][] array, int row, int col) {
         int[] coordinates = new int[2];
 
@@ -151,19 +65,6 @@ public class HWARobot extends VirtualRobot {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     public void setup() {
         System.out.println("My Test Robot Started");
 
@@ -187,11 +88,8 @@ public class HWARobot extends VirtualRobot {
         // Mark the starting cell as visited
         occupancyGrid[rRow][rCol] = 3;
 
-        printArray(occupancyGrid);
+        MappingUtils.printArray(occupancyGrid);
     }
-
-
-
 
 
     public void loop() throws Exception {
@@ -461,10 +359,6 @@ public class HWARobot extends VirtualRobot {
             // }    
 
 
-
-
-
-
             // Move based on the calculated direction
             switch (direction) {
                 case 0: // Facing north
@@ -473,17 +367,17 @@ public class HWARobot extends VirtualRobot {
                             robotRow++;
                             break;
                         case 1: // east
-                            motion.rotateDegree(defaultRotateSpeed, 90);
+                            motion.rotateDegree(ROTATING_SPEED, 90);
                             rightTurns++;
                             robotCol++;
                             break;
                         case 2: // south
-                            motion.rotateDegree(defaultRotateSpeed, 180);
+                            motion.rotateDegree(ROTATING_SPEED, 180);
                             rightTurns++;rightTurns++;
                             robotRow--;
                             break;
                         case 3: // west
-                            motion.rotateDegree(defaultRotateSpeed, -90);
+                            motion.rotateDegree(ROTATING_SPEED, -90);
                             leftTurns++;
                             robotCol--;
                             break;
@@ -492,7 +386,7 @@ public class HWARobot extends VirtualRobot {
                 case 1: // Facing east
                     switch (moveVal) {
                         case 0: // north
-                            motion.rotateDegree(defaultRotateSpeed, -90);
+                            motion.rotateDegree(ROTATING_SPEED, -90);
                             leftTurns++;
                             robotRow++;
                             break;
@@ -500,12 +394,12 @@ public class HWARobot extends VirtualRobot {
                             robotCol++;
                             break;
                         case 2: // south
-                            motion.rotateDegree(defaultRotateSpeed, 90);
+                            motion.rotateDegree(ROTATING_SPEED, 90);
                             rightTurns++;
                             robotRow--;
                             break;
                         case 3: // west
-                            motion.rotateDegree(defaultRotateSpeed, 180);
+                            motion.rotateDegree(ROTATING_SPEED, 180);
                             rightTurns++;rightTurns++;
                             robotCol--;
                             break;
@@ -514,12 +408,12 @@ public class HWARobot extends VirtualRobot {
                 case 2: // Facing south
                     switch (moveVal) {
                         case 0: // north
-                            motion.rotateDegree(defaultRotateSpeed, 180);
+                            motion.rotateDegree(ROTATING_SPEED, 180);
                             rightTurns++;rightTurns++;
                             robotRow++;
                             break;
                         case 1: // east
-                            motion.rotateDegree(defaultRotateSpeed, -90);
+                            motion.rotateDegree(ROTATING_SPEED, -90);
                             leftTurns++;
                             robotCol++;
                             break;
@@ -527,7 +421,7 @@ public class HWARobot extends VirtualRobot {
                             robotRow--;
                             break;
                         case 3: // west
-                            motion.rotateDegree(defaultRotateSpeed, 90);
+                            motion.rotateDegree(ROTATING_SPEED, 90);
                             rightTurns++;
                             robotCol--;
                             break;
@@ -536,17 +430,17 @@ public class HWARobot extends VirtualRobot {
                 case 3: // Facing west
                     switch (moveVal) {
                         case 0: // north
-                            motion.rotateDegree(defaultRotateSpeed, 90);
+                            motion.rotateDegree(ROTATING_SPEED, 90);
                             rightTurns++;
                             robotRow++;
                             break;
                         case 1: // east
-                            motion.rotateDegree(defaultRotateSpeed, 180);
+                            motion.rotateDegree(ROTATING_SPEED, 180);
                             rightTurns++;rightTurns++;
                             robotCol++;
                             break;
                         case 2: // south
-                            motion.rotateDegree(defaultRotateSpeed, -90);
+                            motion.rotateDegree(ROTATING_SPEED, -90);
                             leftTurns++;
                             robotRow--;
                             break;
@@ -557,13 +451,8 @@ public class HWARobot extends VirtualRobot {
                     break;
             }
 
-
-
-
-
-
             // Robot move
-            motion.moveDistance(defaultMoveSpeed, GRID_SPACE);
+            motion.moveDistance(MOVING_SPEED, GRID_SPACE);
             delay(1000);
 
 
@@ -576,7 +465,7 @@ public class HWARobot extends VirtualRobot {
             // printArray(occupancyGrid);
             // printArraySimplified(occupancyGrid);
 
-            simpleComm.sendMessage(arrayToString(occupancyGrid), 200);
+            simpleComm.sendMessage(MappingUtils.arrayToString(occupancyGrid), 200);
         }
     }
 
@@ -584,11 +473,11 @@ public class HWARobot extends VirtualRobot {
         // System.out.println("Robot ID: " + robotId + " communicationInterrupt on " + id + " with msg:\n" + msg);
         // System.out.println();
 
-        int[][] array = stringToArray(msg);
+        int[][] array = MappingUtils.stringToArray(msg);
         // printArray(array);
 
-        occupancyGrid = getMergedMap(occupancyGrid, array);
-        printArray(occupancyGrid);
+        occupancyGrid = MappingUtils.getMergedMap(occupancyGrid, array);
+        MappingUtils.printArray(occupancyGrid);
         // printArraySimplified(occupancyGrid);
         System.out.println();
     }
