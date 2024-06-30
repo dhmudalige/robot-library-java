@@ -2,29 +2,36 @@ package Robots;
 
 import swarm.robot.MappingRobot;
 
+import swarm.utils.ArenaUtils;
 import swarm.utils.MappingUtils;
+
+import static swarm.utils.CSVRecorder.recordExplorations;
 
 /*
 * HWARobot ==> Mapping Robot based on Heuristic Wavefront Algorithm
  */
 
 public class HWARobot extends MappingRobot {
-    public static final String ROBOT_NAME = "<Random Moving Robot>";
+    public static final String ROBOT_NAME = "<HWA Robot>";
     public static final String CSV_PATH = "src/resources/csv-files/Swarm-Results.csv";
 
     // Size of a grid cell
     private final double GRID_SPACE = 18.000;
 
     // Robot's initial position
-    double robotRow = 0;
-    double robotCol = 0;
+    int  robotRow = 0;
+    int robotCol = 0;
     int robotId = 0;
 
+    int loopCount = 0;
+    int matchedCells = 0;
+
+    long startTime, endTime, timeTaken;
 
     public HWARobot(int id, double x, double y, double heading) {
         super(id, x, y, heading);
-        robotRow=(x+81)/18;
-        robotCol=(y+81)/18;
+        robotRow= (int) ((x+81)/18);
+        robotCol= (int) ((y+81)/18);
         robotId=id;
     }
 
@@ -82,8 +89,8 @@ public class HWARobot extends MappingRobot {
             }
         }
 
-        rRow = numRows-1-(int)robotRow;
-        rCol = (int)robotCol;
+        rRow = numRows-1-robotRow;
+        rCol = robotCol;
 
         // Mark the starting cell as visited
         occupancyGrid[rRow][rCol] = 3;
@@ -94,6 +101,9 @@ public class HWARobot extends MappingRobot {
 
     public void loop() throws Exception {
         super.loop();
+        loopCount++;
+
+        startTime = System.currentTimeMillis();
 
         if (state == robotState.RUN) {
             // Get present distances from robot's left,front and right
@@ -127,9 +137,10 @@ public class HWARobot extends MappingRobot {
                 // System.out.println(d[PROXIMITY_RIGHT]);
                 
                 // Mark free spaces
+                double proximityRangeRight = (d[PROXIMITY_RIGHT] + 6) / GRID_SPACE;
                 switch (direction) {
                     case 0: // Facing north
-                        for (int i = 0; i < (d[PROXIMITY_RIGHT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeRight; i++) {
                             // System.out.println(i);
                             occupancyGrid[rRow][rCol+(i)] = 1;
                         }
@@ -138,7 +149,7 @@ public class HWARobot extends MappingRobot {
                         }
                         break;
                     case 1: // Facing east
-                        for (int i = 0; i < (d[PROXIMITY_RIGHT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeRight; i++) {
                             occupancyGrid[rRow+i][rCol] = 1;
                         }
                         if (d[PROXIMITY_RIGHT]==21 && rRow+2<occupancyGrid.length){
@@ -146,7 +157,7 @@ public class HWARobot extends MappingRobot {
                         }
                         break;
                     case 2: // Facing south
-                        for (int i = 0; i < (d[PROXIMITY_RIGHT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeRight; i++) {
                             occupancyGrid[rRow][rCol-(i)] = 1;
                         }
                         if (d[PROXIMITY_RIGHT]==21 && rCol-2>0){
@@ -154,7 +165,7 @@ public class HWARobot extends MappingRobot {
                         }
                         break;
                     case 3: // Facing west
-                        for (int i = 0; i < (d[PROXIMITY_RIGHT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeRight; i++) {
                             occupancyGrid[rRow-i][rCol] = 1;
                         }
                         if (d[PROXIMITY_RIGHT]==21 && rRow-2>0){
@@ -172,7 +183,7 @@ public class HWARobot extends MappingRobot {
                         }
                         break;
                     case 1: // Facing east
-                        if ((int)robotRow != 0 && occupancyGrid[rRow+1][rCol] == 0){
+                        if (robotRow != 0 && occupancyGrid[rRow+1][rCol] == 0){
                             occupancyGrid[rRow+1][rCol] = 2;
                         }
                         break;
@@ -182,7 +193,7 @@ public class HWARobot extends MappingRobot {
                         }
                         break;
                     case 3: // Facing west
-                        if ((int)robotRow != numRows-1 && occupancyGrid[rRow-1][rCol] == 0){
+                        if (robotRow != numRows-1 && occupancyGrid[rRow-1][rCol] == 0){
                             occupancyGrid[rRow-1][rCol] = 2;
                         }
                         break;
@@ -191,11 +202,11 @@ public class HWARobot extends MappingRobot {
 
             
             if (d[PROXIMITY_FRONT] + 6 > GRID_SPACE) {
-
                 // Mark free spaces
+                double proximityRangeFront = (d[PROXIMITY_FRONT] + 6) / GRID_SPACE;
                 switch (direction) {
                     case 0: // Facing north
-                        for (int i = 0; i < (d[PROXIMITY_FRONT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeFront; i++) {
                             occupancyGrid[rRow-i][rCol] = 1;
                         }
                         if (d[PROXIMITY_FRONT]==21 && rRow-2>0){
@@ -203,7 +214,7 @@ public class HWARobot extends MappingRobot {
                         }
                         break;
                     case 1: // Facing east
-                        for (int i = 0; i < (d[PROXIMITY_FRONT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeFront; i++) {
                             occupancyGrid[rRow][rCol+i] = 1;
                         } 
                         if (d[PROXIMITY_FRONT]==21 && rCol+2<occupancyGrid[0].length){
@@ -211,7 +222,7 @@ public class HWARobot extends MappingRobot {
                         }                       
                         break;
                     case 2: // Facing south
-                        for (int i = 0; i < (d[PROXIMITY_FRONT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeFront; i++) {
                             occupancyGrid[rRow+i][rCol] = 1;
                         }   
                         if (d[PROXIMITY_FRONT]==21 && rRow+2<occupancyGrid.length){
@@ -219,7 +230,7 @@ public class HWARobot extends MappingRobot {
                         }       
                         break;
                     case 3: // Facing west
-                        for (int i = 0; i < (d[PROXIMITY_FRONT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeFront; i++) {
                             occupancyGrid[rRow][rCol-i] = 1;
                         }     
                         if (d[PROXIMITY_FRONT]==21 && rCol-2>0){
@@ -232,7 +243,7 @@ public class HWARobot extends MappingRobot {
                 // Mark obstacles
                 switch (direction) {
                     case 0: // Facing north
-                        if ((int)robotRow != numRows-1 && occupancyGrid[rRow-1][rCol] == 0){
+                        if (robotRow != numRows-1 && occupancyGrid[rRow-1][rCol] == 0){
                             occupancyGrid[rRow-1][rCol] = 2;
                         }
                         break;
@@ -242,7 +253,7 @@ public class HWARobot extends MappingRobot {
                         }
                         break;
                     case 2: // Facing south
-                        if ((int)robotRow != 0 && occupancyGrid[rRow+1][rCol] == 0){
+                        if (robotRow != 0 && occupancyGrid[rRow+1][rCol] == 0){
                             occupancyGrid[rRow+1][rCol] = 2;
                         }
                         break;
@@ -255,15 +266,13 @@ public class HWARobot extends MappingRobot {
             }
 
 
-
-
-
             if (d[PROXIMITY_LEFT] + 6 > GRID_SPACE) {
 
                 // Mark free spaces
+                double proximityRangeLeft = (d[PROXIMITY_LEFT] + 6) / GRID_SPACE;
                 switch (direction) {
                     case 0: // Facing north
-                        for (int i = 0; i < (d[PROXIMITY_LEFT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeLeft; i++) {
                             occupancyGrid[rRow][rCol-i] = 1;
                         }  
                         if (d[PROXIMITY_LEFT]==21 && rCol-2>0){
@@ -271,7 +280,7 @@ public class HWARobot extends MappingRobot {
                         }        
                         break;
                     case 1: // Facing east
-                        for (int i = 0; i < (d[PROXIMITY_LEFT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeLeft; i++) {
                             occupancyGrid[rRow-i][rCol] = 1;
                         }       
                         if (d[PROXIMITY_LEFT]==21 && rRow-2>0){
@@ -279,7 +288,7 @@ public class HWARobot extends MappingRobot {
                         }   
                         break;
                     case 2: // Facing south
-                        for (int i = 0; i < (d[PROXIMITY_LEFT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeLeft; i++) {
                             occupancyGrid[rRow][rCol+i] = 1;
                         }  
                         if (d[PROXIMITY_LEFT]==21 && rCol+2<occupancyGrid[0].length){
@@ -287,7 +296,7 @@ public class HWARobot extends MappingRobot {
                         }        
                         break;
                     case 3: // Facing west
-                        for (int i = 0; i < (d[PROXIMITY_LEFT] + 6) / GRID_SPACE; i++) {
+                        for (int i = 0; i < proximityRangeLeft; i++) {
                             occupancyGrid[rRow+i][rCol] = 1;
                         }
                         if (d[PROXIMITY_LEFT]==21 && rRow+2<occupancyGrid.length){
@@ -305,7 +314,7 @@ public class HWARobot extends MappingRobot {
                         }
                         break;
                     case 1: // Facing east
-                        if ((int)robotRow != numRows-1 && occupancyGrid[rRow-1][rCol] == 0){
+                        if (robotRow != numRows-1 && occupancyGrid[rRow-1][rCol] == 0){
                             occupancyGrid[rRow-1][rCol] = 2;
                         }
                         break;
@@ -315,7 +324,7 @@ public class HWARobot extends MappingRobot {
                         }
                         break;
                     case 3: // Facing west
-                        if ((int)robotRow != 0 && occupancyGrid[rRow+1][rCol] == 0){
+                        if (robotRow != 0 && occupancyGrid[rRow+1][rCol] == 0){
                             occupancyGrid[rRow+1][rCol] = 2;
                         }
                         break;
@@ -456,8 +465,8 @@ public class HWARobot extends MappingRobot {
             delay(1000);
 
 
-            rRow = numRows-1-(int)robotRow;
-            rCol = (int)robotCol;
+            rRow = numRows-1-robotRow;
+            rCol = robotCol;
 
             occupancyGrid[rRow][rCol] = 3;
             
@@ -467,6 +476,17 @@ public class HWARobot extends MappingRobot {
 
             simpleComm.sendMessage(MappingUtils.arrayToString(occupancyGrid), 200);
         }
+
+        endTime = System.currentTimeMillis();
+
+        timeTaken = endTime - startTime;
+
+        MappingUtils.convertThreesToOnes(occupancyGrid);
+
+        matchedCells = MappingUtils.countMatchedCells(occupancyGrid, ArenaUtils.ARENA_OBSTACLE);
+
+        recordExplorations(CSV_PATH, ROBOT_NAME, this.robotId, endTime, loopCount, timeTaken, matchedCells);
+
     }
 
     public void communicationInterrupt(String msg) {

@@ -59,8 +59,9 @@ public class App extends Thread {
 
 
             // Start HWARobots
-//            addRuntimeInfo(CSV_PATH, HWARobot.ROBOT_NAME, ROBOT_COUNT, ARENA_TYPE);
-            Robot robot1 = new HWARobot(10, 0, 0, 90);
+            addRuntimeInfo(CSV_PATH, HWARobot.ROBOT_NAME, ROBOT_COUNT, ARENA_TYPE);
+
+            Robot robot1 = new HWARobot(10, 81, 81, 90);
             new Thread(robot1).start();
 
             Robot robot2 = new HWARobot(11, -81, -81, 90);
