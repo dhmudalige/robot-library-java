@@ -38,10 +38,10 @@ public class App extends Thread {
 //            new Thread(robot).start();
 
             // Starting nearest neighbor algorithm
-            Robot robot1 = new FrontierBasedMappingRobot(10, 0, 0, 90);
+            Robot robot1 = new HWARobot(10, 0, 0, 90);
             new Thread(robot1).start();
 
-            Robot robot2 = new FrontierBasedMappingRobot(11, -81, -81, 90);
+            Robot robot2 = new HWARobot(11, -81, -81, 90);
             new Thread(robot2).start();
 
             // // Start a swarm of robots

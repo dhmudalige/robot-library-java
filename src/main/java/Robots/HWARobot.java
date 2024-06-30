@@ -2,7 +2,11 @@ package Robots;
 
 import swarm.robot.VirtualRobot;
 
-public class FrontierBasedMappingRobot extends VirtualRobot {
+/*
+* HWARobot ==> Mapping Robot based on Heuristic Wavefront Algorithm
+ */
+
+public class HWARobot extends VirtualRobot {
 
     // Size of a grid cell
     private final double GRID_SPACE = 18.000;
@@ -32,7 +36,7 @@ public class FrontierBasedMappingRobot extends VirtualRobot {
     int robotId = 0;
 
 
-    public FrontierBasedMappingRobot(int id, double x, double y, double heading) {
+    public HWARobot(int id, double x, double y, double heading) {
         super(id, x, y, heading);
         robotRow=(x+81)/18;
         robotCol=(y+81)/18;
