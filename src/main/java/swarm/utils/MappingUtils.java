@@ -54,4 +54,27 @@ public class MappingUtils {
         }
         return mergedMap;
     }
+
+    public static void convertThreesToOnes(int[][] matrix) {
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                if (matrix[i][j] == 3) {
+                    matrix[i][j] = 1;
+                }
+            }
+        }
+    }
+
+    public static int countMatchedCells(int[][] A, int[][] B) {
+        int count = 0;
+        for (int i = 0; i < A.length; i++) {
+            for (int j = 0; j < A[i].length; j++) {
+                if (A[i][j] == B[i][j]) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
 }

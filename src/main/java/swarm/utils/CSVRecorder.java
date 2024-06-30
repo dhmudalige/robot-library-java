@@ -23,7 +23,7 @@ public class CSVRecorder {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
             writer.write("\n");
             writer.write("TIME:" + getTime() + ",ROBOT-TYPE:" + robotType +  ",ROBOT-COUNT:" + robotCount + ",ARENA-TYPE:<" + arenaType + ">\n");
-            writer.write("timestamp,cycle,total-time,matched" + "\n");
+            writer.write("timestamp,robot-id,cycle,total-time,matched" + "\n");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -40,12 +40,12 @@ public class CSVRecorder {
 //        }
 //    }
 
-    public static void recordExplorations(String filePath, String robotType, long timestamp, int count, long timeTaken){
+    public static void recordExplorations(String filePath, String robotType, int robotID, long timestamp, int count, long timeTaken, int matchedCells){
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
-            writer.write(timestamp + "," + count + "," + timeTaken + "\n");
+            writer.write(timestamp + "," + robotID + "," + count + "," + timeTaken + "," + matchedCells + "\n");
 //            writer.write("\n");
 
-            System.out.println(robotType + " cycle:" + count + ", total-time:" + timeTaken + " ms");
+            System.out.println(robotType + "["+ robotID +"]"+ " cycle:" + count + ", total-time:" + timeTaken + " ms");
 
         } catch (IOException e) {
             throw new RuntimeException(e);

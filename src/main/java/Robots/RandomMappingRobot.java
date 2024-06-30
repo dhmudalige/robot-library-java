@@ -1,6 +1,7 @@
 package Robots;
 
 import swarm.robot.MappingRobot;
+import swarm.utils.ArenaUtils;
 import swarm.utils.MappingUtils;
 
 import java.util.ArrayList;
@@ -21,6 +22,9 @@ public class RandomMappingRobot extends MappingRobot {
     int robotId = 0;
 
     int loopCount = 0;
+    int matchedCells = 0;
+
+    long startTime, endTime, timeTaken;
 
     public RandomMappingRobot(int id, double x, double y, double heading) {
         super(id, x, y, heading);
@@ -67,7 +71,7 @@ public class RandomMappingRobot extends MappingRobot {
         super.loop();
         loopCount++;
 
-        long startTime = System.currentTimeMillis();
+        startTime = System.currentTimeMillis();
 
         if (state == robotState.RUN) {
             // Get present distances from robot's left,front and right
@@ -314,11 +318,15 @@ public class RandomMappingRobot extends MappingRobot {
             simpleComm.sendMessage(MappingUtils.arrayToString(occupancyGrid), 200);
         }
 
-        long endTime = System.currentTimeMillis();
+        endTime = System.currentTimeMillis();
 
-        long timeTaken = endTime - startTime;
+        timeTaken = endTime - startTime;
 
-        recordExplorations(CSV_PATH, ROBOT_NAME, endTime, loopCount, timeTaken);
+        MappingUtils.convertThreesToOnes(occupancyGrid);
+
+        matchedCells = MappingUtils.countMatchedCells(occupancyGrid, ArenaUtils.ARENA_OBSTACLE);
+
+        recordExplorations(CSV_PATH, ROBOT_NAME, this.robotId, endTime, loopCount, timeTaken, matchedCells);
     }
 
     public void communicationInterrupt(String msg) {
@@ -328,8 +336,8 @@ public class RandomMappingRobot extends MappingRobot {
         int[][] array = MappingUtils.stringToArray(msg);
         // printArray(array);
 
-        occupancyGrid = MappingUtils.getMergedMap(occupancyGrid, array);
-        MappingUtils.printArray(occupancyGrid);
+        int[][] mergedArray = MappingUtils.getMergedMap(occupancyGrid, array);
+        MappingUtils.printArray(mergedArray);
         System.out.println();
     }
 }
