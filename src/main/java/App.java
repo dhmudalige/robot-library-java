@@ -32,16 +32,16 @@ public class App extends Thread {
             MQTTSettings.channel = props.getProperty("channel", "v1");
             reader.close();
 
-            Robot robot1 = new HeuristicRobot(9, 63, 63, 90);
+            Robot robot1 = new HLCARobot(9, 63, 63, 90);
             new Thread(robot1).start();
 
-            Robot robot2 = new HeuristicRobot(10, -81, -81, 90);
+            Robot robot2 = new HLCARobot(10, -81, -81, 90);
             new Thread(robot2).start();
 
-            Robot robot3 = new HeuristicRobot(10, -81, -81, 90);
+            Robot robot3 = new HLCARobot(10, -81, -81, 90);
             new Thread(robot3).start();
 //
-//            Robot robot4 = new HeuristicRobot(10, -81, -81, 90);
+//            Robot robot4 = new HLCARobot(10, -81, -81, 90);
 //            new Thread(robot4).start();
 
             long setupEndTime = System.currentTimeMillis();

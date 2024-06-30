@@ -2,7 +2,11 @@ package Robots;
 
 import swarm.robot.VirtualRobot;
 
-public class HeuristicRobot extends VirtualRobot {
+/*
+ * HLWARobot ==> Mapping Robot based on Heuristic Least Cost Estimate
+ */
+
+public class HLCARobot extends VirtualRobot {
 
     // Size of a grid cell
     private final double GRID_SPACE = 18.000;
@@ -36,7 +40,7 @@ public class HeuristicRobot extends VirtualRobot {
     int cellValue = 0;
     int[] cellValuesNESW = new int[4];
 
-    public HeuristicRobot(int id, double x, double y, double heading) {
+    public HLCARobot(int id, double x, double y, double heading) {
         super(id, x, y, heading);
         robotRow=(x+81)/18;
         robotCol=(y+81)/18;
