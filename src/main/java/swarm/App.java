@@ -50,13 +50,42 @@ public class App extends Thread {
             // Start a random moving robots
             ////////////////////////////////////////////////////////
             addRuntimeInfo(CSV_PATH, RandomMappingRobot.ROBOT_NAME, ROBOT_COUNT, ARENA_TYPE);
-            ////////////////////////////////////////////////////////
 
-            Robot robot1 = new RandomMappingRobot(10, 81, 81, 90);
+            Robot robot1 = new RandomMappingRobot(1, 81, 81, 90);
             new Thread(robot1).start();
 
-            Robot robot2 = new RandomMappingRobot(11, -81, -81, 90);
+            Robot robot2 = new RandomMappingRobot(2, -81, -81, 90);
             new Thread(robot2).start();
+
+            Robot robot3 = new RandomMappingRobot(3, 81, 81, 90);
+            new Thread(robot3).start();
+
+            Robot robot4 = new RandomMappingRobot(4, -81, -81, 90);
+            new Thread(robot4).start();
+
+            Robot robot5 = new RandomMappingRobot(5, 81, 81, 90);
+            new Thread(robot5).start();
+
+            Robot robot6 = new RandomMappingRobot(6, -81, -81, 90);
+            new Thread(robot6).start();
+
+            Robot robot7 = new RandomMappingRobot(7, 81, 81, 90);
+            new Thread(robot7).start();
+
+            Robot robot8 = new RandomMappingRobot(8, -81, -81, 90);
+            new Thread(robot8).start();
+
+            Robot robot9 = new RandomMappingRobot(9, 81, 81, 90);
+            new Thread(robot9).start();
+
+            Robot robot10 = new RandomMappingRobot(10, -81, -81, 90);
+            new Thread(robot10).start();
+
+//            Robot robot11 = new RandomMappingRobot(11, 81, 81, 90);
+//            new Thread(robot11).start();
+//
+//            Robot robot12 = new RandomMappingRobot(12, -81, -81, 90);
+//            new Thread(robot12).start();
 
             // // Start a swarm of robots
             // int[] robotList = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
